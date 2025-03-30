@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,45 +14,50 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const { login, isAuthenticated, currentUser } = useAuth();
   
   // Extrair a rota de retorno dos state params, se disponível
-  const returnTo = location.state?.returnTo || (
-    email.includes("profissional") ? "/profissional/dashboard" : "/paciente/dashboard"
-  );
+  const returnTo = location.state?.returnTo || (() => {
+    if (currentUser) {
+      switch (currentUser.role) {
+        case "professional":
+          return "/profissional/dashboard";
+        case "patient":
+          return "/paciente/dashboard";
+        case "admin":
+        case "super_admin":
+          return "/admin/dashboard";
+        default:
+          return "/";
+      }
+    }
+    return "/";
+  })();
   
   useEffect(() => {
-    // Verificar se o usuário já está logado
-    if (localStorage.getItem('isLoggedIn') === 'true') {
+    // Redirect if already logged in
+    if (isAuthenticated) {
       navigate(returnTo);
     }
-  }, [navigate, returnTo]);
+  }, [isAuthenticated, navigate, returnTo]);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     
     if (!email || !password) {
       setError("Por favor, preencha todos os campos");
       return;
     }
     
-    // Simulação de autenticação bem-sucedida
-    // Em uma aplicação real, isso seria uma chamada à API
     try {
-      // Armazenar o status de login no localStorage
-      localStorage.setItem('isLoggedIn', 'true');
+      await login(email, password);
       
-      // Mensagem de sucesso
-      toast.success("Login realizado com sucesso!", {
-        description: "Redirecionando...",
-        duration: 3000
-      });
+      // Login success toast is shown by the auth provider
       
-      // Redirecionar para a rota de retorno ou dashboard apropriado
-      setTimeout(() => {
-        navigate(returnTo);
-      }, 1000);
-    } catch (err) {
-      setError("Falha no login. Verifique suas credenciais.");
+      // Redirect handled by the useEffect
+    } catch (err: any) {
+      setError(err.message || "Falha no login. Verifique suas credenciais.");
     }
   };
   
@@ -122,9 +128,9 @@ const Login = () => {
                 </button>
               </div>
               <div className="mt-2 text-right">
-                <a href="#" className="text-sm text-clinic-yellow hover:underline">
+                <Link to="/forgot-password" className="text-sm text-clinic-yellow hover:underline">
                   Esqueceu sua senha?
-                </a>
+                </Link>
               </div>
             </div>
             

@@ -5,30 +5,45 @@ import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useAuth, UserRole } from "@/contexts/AuthContext";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userType, setUserType] = useState("paciente");
+  const [userType, setUserType] = useState("patient");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const { register } = useAuth();
   
   // Extrair a rota de retorno dos state params, se disponível
   const returnTo = location.state?.returnTo || (
-    userType === "profissional" ? "/profissional/dashboard" : "/paciente/dashboard"
+    userType === "professional" ? "/profissional/dashboard" : "/paciente/dashboard"
   );
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would handle registration here
-    // For now, let's just simulate a basic validation
+    setError("");
     
     if (!name || !email || !password || !confirmPassword) {
       setError("Por favor, preencha todos os campos");
+      return;
+    }
+    
+    // Validate email format
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      setError("Formato de email inválido");
+      return;
+    }
+    
+    // Validate password strength
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
+    if (!passwordPattern.test(password)) {
+      setError("Senha deve ter no mínimo 10 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
       return;
     }
     
@@ -38,24 +53,19 @@ const Register = () => {
     }
     
     try {
-      // Simulação de cadastro bem-sucedido
-      // Em uma aplicação real, isso seria uma chamada à API
+      // Convert userType string to UserRole enum
+      const role = userType === "professional" 
+        ? UserRole.PROFESSIONAL 
+        : UserRole.PATIENT;
       
-      // Armazenar o status de login no localStorage
-      localStorage.setItem('isLoggedIn', 'true');
+      await register(name, email, password, role);
       
-      // Mensagem de sucesso
-      toast.success("Cadastro realizado com sucesso!", {
-        description: "Redirecionando...",
-        duration: 3000
-      });
+      // Registration success notification is shown by auth provider
       
-      // Redirecionar para a rota de retorno ou dashboard apropriado
-      setTimeout(() => {
-        navigate(returnTo);
-      }, 1000);
-    } catch (err) {
-      setError("Falha no cadastro. Tente novamente mais tarde.");
+      // Redirect to appropriate dashboard
+      navigate(returnTo);
+    } catch (err: any) {
+      setError(err.message || "Falha no cadastro. Tente novamente mais tarde.");
     }
   };
   
@@ -123,9 +133,9 @@ const Register = () => {
                   <input
                     type="radio"
                     name="userType"
-                    value="paciente"
-                    checked={userType === "paciente"}
-                    onChange={() => setUserType("paciente")}
+                    value="patient"
+                    checked={userType === "patient"}
+                    onChange={() => setUserType("patient")}
                     className="mr-2"
                   />
                   Paciente
@@ -134,9 +144,9 @@ const Register = () => {
                   <input
                     type="radio"
                     name="userType"
-                    value="profissional"
-                    checked={userType === "profissional"}
-                    onChange={() => setUserType("profissional")}
+                    value="professional"
+                    checked={userType === "professional"}
+                    onChange={() => setUserType("professional")}
                     className="mr-2"
                   />
                   Profissional
@@ -170,6 +180,9 @@ const Register = () => {
                   )}
                 </button>
               </div>
+              <p className="text-xs text-gray-500 mt-1">
+                A senha deve ter pelo menos 10 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.
+              </p>
             </div>
             
             <div className="mb-6">
