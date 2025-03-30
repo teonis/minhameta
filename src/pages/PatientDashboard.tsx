@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -11,11 +10,13 @@ import {
   AlertCircle,
   Camera,
   Plus,
-  Edit
+  Edit,
+  FileText,
+  Send
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 
-// Simulated data - would be fetched from backend in real app
 const patientData = {
   id: 1,
   name: "Marcos Silva",
@@ -63,11 +64,35 @@ const achievementsData = [
   { id: 3, title: "Meta de Alta Prioridade", date: "05/09/2023", description: "Completou com sucesso uma meta de alta prioridade." }
 ];
 
+const diaryEntriesData = [
+  {
+    id: 1,
+    date: "10/11/2023",
+    content: "Hoje me senti mais disposto. Consegui realizar todos os exercícios recomendados pela Dra. Tay e tive menos dores nas costas.",
+    mood: "happy"
+  },
+  {
+    id: 2,
+    date: "09/11/2023",
+    content: "Dia difícil. Tive dores nas articulações e não consegui fazer a caminhada completa. Preciso conversar com o Dr. Teonis sobre ajustes na medicação.",
+    mood: "sad"
+  },
+  {
+    id: 3,
+    date: "08/11/2023",
+    content: "Dia neutro. Nem muitas dores, nem muita disposição. Fiz apenas metade dos exercícios recomendados.",
+    mood: "neutral"
+  }
+];
+
 const PatientDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedGoal, setSelectedGoal] = useState<number | null>(null);
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [diaryContent, setDiaryContent] = useState("");
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [diaryEntries, setDiaryEntries] = useState(diaryEntriesData);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
@@ -98,10 +123,38 @@ const PatientDashboard = () => {
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
+
+  const handleDiarySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!diaryContent.trim() || !selectedMood) {
+      toast({
+        title: "Erro ao salvar",
+        description: "Por favor, escreva como você está se sentindo e selecione um humor.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newEntry = {
+      id: diaryEntries.length + 1,
+      date: new Date().toLocaleDateString('pt-BR'),
+      content: diaryContent,
+      mood: selectedMood
+    };
+
+    setDiaryEntries([newEntry, ...diaryEntries]);
+    setDiaryContent("");
+    setSelectedMood(null);
+
+    toast({
+      title: "Diário atualizado",
+      description: "Seu registro foi adicionado com sucesso ao diário.",
+    });
+  };
   
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar */}
       <aside className="bg-secondary text-white w-20 md:w-64 flex flex-col">
         <div className="p-4 flex items-center justify-center md:justify-start">
           <div className="bg-clinic-yellow p-2 rounded-md">
@@ -136,6 +189,19 @@ const PatientDashboard = () => {
               >
                 <CheckCircle className="h-5 w-5 md:mr-3" />
                 <span className="hidden md:inline">Minhas Metas</span>
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveTab("diary")}
+                className={`w-full flex items-center px-4 py-3 ${
+                  activeTab === "diary"
+                    ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"
+                    : "hover:bg-secondary-foreground/5"
+                }`}
+              >
+                <FileText className="h-5 w-5 md:mr-3" />
+                <span className="hidden md:inline">Meu Diário</span>
               </button>
             </li>
             <li>
@@ -178,14 +244,13 @@ const PatientDashboard = () => {
         </div>
       </aside>
       
-      {/* Main Content */}
       <div className="flex-grow bg-gray-50 overflow-y-auto">
-        {/* Header */}
         <header className="bg-white shadow-sm p-4">
           <div className="flex justify-between items-center">
             <h1 className="text-xl font-bold">
               {activeTab === "dashboard" && "Dashboard do Paciente"}
               {activeTab === "goals" && "Minhas Metas"}
+              {activeTab === "diary" && "Meu Diário"}
               {activeTab === "achievements" && "Minhas Conquistas"}
               {activeTab === "settings" && "Configurações"}
             </h1>
@@ -209,7 +274,6 @@ const PatientDashboard = () => {
           </div>
         </header>
         
-        {/* Dashboard Content */}
         {activeTab === "dashboard" && (
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -357,7 +421,6 @@ const PatientDashboard = () => {
           </div>
         )}
         
-        {/* Goals Tab */}
         {activeTab === "goals" && (
           <div className="p-6">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -458,7 +521,101 @@ const PatientDashboard = () => {
           </div>
         )}
         
-        {/* Achievements Tab */}
+        {activeTab === "diary" && (
+          <div className="p-6">
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <h2 className="text-xl font-bold mb-4">Como você está se sentindo hoje?</h2>
+              
+              <form onSubmit={handleDiarySubmit}>
+                <div className="mb-4">
+                  <label htmlFor="diaryContent" className="block text-sm font-medium text-gray-700 mb-2">
+                    Registre seus pensamentos, sentimentos e progresso
+                  </label>
+                  <Textarea
+                    id="diaryContent"
+                    placeholder="Hoje eu me sinto..."
+                    className="min-h-[120px]"
+                    value={diaryContent}
+                    onChange={(e) => setDiaryContent(e.target.value)}
+                  />
+                </div>
+                
+                <div className="mb-4">
+                  <p className="block text-sm font-medium text-gray-700 mb-2">Como está seu humor?</p>
+                  <div className="flex space-x-4">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMood("happy")}
+                      className={`p-3 rounded-full ${
+                        selectedMood === "happy" ? "bg-green-100 ring-2 ring-green-500" : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                    >
+                      <span className="text-2xl">😊</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMood("neutral")}
+                      className={`p-3 rounded-full ${
+                        selectedMood === "neutral" ? "bg-blue-100 ring-2 ring-blue-500" : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                    >
+                      <span className="text-2xl">😐</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMood("sad")}
+                      className={`p-3 rounded-full ${
+                        selectedMood === "sad" ? "bg-red-100 ring-2 ring-red-500" : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                    >
+                      <span className="text-2xl">😔</span>
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="flex items-center px-4 py-2 bg-clinic-yellow text-black rounded-md hover:bg-clinic-yellow/90"
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    Salvar no Diário
+                  </button>
+                </div>
+              </form>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="p-4 border-b">
+                <h2 className="text-xl font-bold">Histórico do Diário</h2>
+                <p className="text-sm text-gray-600">Seus registros anteriores</p>
+              </div>
+              
+              <div className="p-4">
+                <div className="space-y-6">
+                  {diaryEntries.map((entry) => (
+                    <div key={entry.id} className="bg-gray-50 rounded-lg p-4 border-l-4 border-clinic-yellow">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-grow">
+                          <div className="flex items-center mb-2">
+                            <span className="text-2xl mr-2">
+                              {entry.mood === "happy" && "😊"}
+                              {entry.mood === "neutral" && "😐"}
+                              {entry.mood === "sad" && "😔"}
+                            </span>
+                            <h3 className="font-bold">{entry.date}</h3>
+                          </div>
+                          <p className="text-gray-700">{entry.content}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {activeTab === "achievements" && (
           <div className="p-6">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -485,7 +642,6 @@ const PatientDashboard = () => {
           </div>
         )}
         
-        {/* Settings Tab */}
         {activeTab === "settings" && (
           <div className="p-6">
             <div className="bg-white rounded-lg shadow-sm p-6 max-w-2xl">
@@ -608,7 +764,6 @@ const PatientDashboard = () => {
         )}
       </div>
       
-      {/* Add Evidence Modal */}
       {showEvidenceModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
