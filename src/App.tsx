@@ -11,6 +11,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProfessionalDashboard from "./pages/ProfessionalDashboard";
 import PatientDashboard from "./pages/PatientDashboard";
+import CommunityPage from "./pages/CommunityPage";
+import AIPage from "./pages/AIPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/profissional/dashboard" element={<ProfessionalDashboard />} />
           <Route path="/paciente/dashboard" element={<PatientDashboard />} />
+          <Route path="/comunidade" element={<CommunityPage />} />
+          <Route path="/ia" element={<AIPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Check, Calendar, User, Sparkles } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -14,10 +15,10 @@ const Landing = () => {
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
-                <span className="inline-flex items-center gap-2 bg-white/80 text-clinic-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
+                <Link to="/ia" className="inline-flex items-center gap-2 bg-white/80 text-clinic-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm hover:bg-white hover:shadow-md transition-all">
                   <Sparkles size={16} className="text-clinic-yellow" />
-                  Desenvolvido pela Clínica Rocha
-                </span>
+                  Desenvolvido pela Clínica Rocha com todo o poder da IA
+                </Link>
                 <h1 className="text-4xl md:text-5xl font-bold">
                   Transformando metas em{" "}
                   <span className="text-clinic-yellow">conquistas</span>

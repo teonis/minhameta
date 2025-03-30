@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Users } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,6 +36,9 @@ const Navbar = () => {
           <Link to="/sobre-app" className="hover:text-clinic-yellow transition-colors">
             Sobre o Aplicativo
           </Link>
+          <Link to="/comunidade" className="flex items-center gap-1 hover:text-clinic-yellow transition-colors">
+            <Users size={18} /> Comunidade
+          </Link>
           <Link to="/login" className="btn-primary">
             Entrar
           </Link>
@@ -62,6 +65,9 @@ const Navbar = () => {
             </Link>
             <Link to="/sobre-app" className="hover:text-clinic-yellow p-2 transition-colors" onClick={toggleMenu}>
               Sobre o Aplicativo
+            </Link>
+            <Link to="/comunidade" className="flex items-center gap-1 hover:text-clinic-yellow p-2 transition-colors" onClick={toggleMenu}>
+              <Users size={18} /> Comunidade
             </Link>
             <Link to="/login" className="btn-primary p-2 text-center" onClick={toggleMenu}>
               Entrar
