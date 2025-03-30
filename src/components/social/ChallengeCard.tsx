@@ -1,24 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Calendar, Trophy } from 'lucide-react';
-
-type Challenge = {
-  id: number;
-  title: string;
-  description: string;
-  groupId: number;
-  groupName: string;
-  professionalId: number;
-  professionalName: string;
-  startDate: string;
-  endDate: string;
-  collectiveGoal: number;
-  currentProgress: number;
-  participants: number;
-};
+import { Challenge } from './types';
 
 type ChallengeCardProps = {
   challenge: Challenge;

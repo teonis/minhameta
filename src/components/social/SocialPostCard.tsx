@@ -1,35 +1,10 @@
-
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ThumbsUp, Heart, Award, MessageSquare, Send, Globe, UserPlus, Lock } from 'lucide-react';
-
-type Comment = {
-  id: number;
-  userId: number;
-  userName: string;
-  content: string;
-};
-
-type Post = {
-  id: number;
-  userId: number;
-  userName: string;
-  userInitials: string;
-  userAvatar: string | null;
-  content: string;
-  image: string | null;
-  visibility: 'public' | 'friends' | 'private';
-  createdAt: string;
-  reactions: {
-    thumbsUp: number;
-    heart: number;
-    clap: number;
-  };
-  comments: Comment[];
-};
+import { Post } from './types';
 
 type SocialPostCardProps = {
   post: Post;
@@ -60,14 +35,12 @@ const SocialPostCard = ({ post }: SocialPostCardProps) => {
       ...prev,
       [type]: !prev[type]
     }));
-    // In a real app, this would update the reaction count in the database
   };
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
     
-    // In a real app, this would send the comment to the database
     alert(`Comentário enviado: ${newComment}`);
     setNewComment('');
   };

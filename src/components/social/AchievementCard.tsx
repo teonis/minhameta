@@ -1,18 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-type Achievement = {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-  category: string;
-  level: 'bronze' | 'prata' | 'ouro';
-  unlockedAt: string | null;
-};
+import { Achievement } from './types';
 
 type AchievementCardProps = {
   achievement: Achievement;

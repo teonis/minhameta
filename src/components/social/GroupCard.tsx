@@ -1,19 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users } from 'lucide-react';
-
-type Group = {
-  id: number;
-  name: string;
-  description: string;
-  coverImage: string;
-  memberCount: number;
-  professionalId: number;
-  professionalName: string;
-};
+import { Group } from './types';
 
 type GroupCardProps = {
   group: Group;
