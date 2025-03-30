@@ -6,13 +6,11 @@ import {
   User, 
   Settings
 } from "lucide-react";
+import { useProfessionalDashboard } from "@/contexts/ProfessionalDashboardContext";
 
-type SidebarProps = {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-}
+const ProfessionalSidebar = () => {
+  const { activeTab, setActiveTab } = useProfessionalDashboard();
 
-const ProfessionalSidebar = ({ activeTab, setActiveTab }: SidebarProps) => {
   return (
     <aside className="bg-secondary text-white w-20 md:w-64 flex flex-col">
       <div className="p-4 flex items-center justify-center md:justify-start">
