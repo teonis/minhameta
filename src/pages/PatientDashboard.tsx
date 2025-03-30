@@ -1,19 +1,29 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { 
   LogOut, 
   User, 
   Settings, 
-  Check, 
+  Calendar, 
+  CheckCircle, 
   Clock, 
-  AlertTriangle,
+  AlertCircle,
   Camera,
-  Send
+  Plus,
+  Edit
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Simulated data - would be fetched from backend in real app
+const patientData = {
+  id: 1,
+  name: "Marcos Silva",
+  email: "marcos@email.com",
+  profilePicture: null,
+  joinedDate: "10/05/2023"
+};
+
 const goalsData = [
   { 
     id: 1, 
@@ -22,8 +32,8 @@ const goalsData = [
     dueDate: "10/11/2023", 
     priority: "alta", 
     description: "Realizar exercícios de respiração diafragmática por 10 minutos diariamente.",
-    feedback: "Excelente progresso! Continue praticando diariamente para melhores resultados.",
-    evidence: ["https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2"]
+    progress: 100,
+    professional: "Dra. Tay Rocha"
   },
   { 
     id: 2, 
@@ -32,60 +42,61 @@ const goalsData = [
     dueDate: "15/11/2023", 
     priority: "média", 
     description: "Caminhar por pelo menos 20 minutos todos os dias.",
-    feedback: "",
-    evidence: []
+    progress: 60,
+    professional: "Dra. Tay Rocha"
   },
   { 
     id: 3, 
     title: "Prática de Mindfulness", 
     status: "pending",
     dueDate: "18/11/2023", 
-    priority: "baixa", 
+    priority: "baixa",
     description: "Realizar 15 minutos de prática de atenção plena todas as manhãs.",
-    feedback: "",
-    evidence: []
-  },
+    progress: 0,
+    professional: "Dr. Teonis Rocha"
+  }
 ];
 
-const progressData = [
-  { week: "Semana 1", completed: 2, total: 3 },
-  { week: "Semana 2", completed: 3, total: 3 },
-  { week: "Semana 3", completed: 2, total: 4 },
-  { week: "Semana 4", completed: 4, total: 5 },
+const achievementsData = [
+  { id: 1, title: "Primeira Meta Concluída", date: "15/06/2023", description: "Parabéns por completar sua primeira meta!" },
+  { id: 2, title: "7 Dias Consecutivos", date: "22/07/2023", description: "Você manteve atividades por 7 dias seguidos!" },
+  { id: 3, title: "Meta de Alta Prioridade", date: "05/09/2023", description: "Completou com sucesso uma meta de alta prioridade." }
 ];
 
 const PatientDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [selectedGoal, setSelectedGoal] = useState<typeof goalsData[0] | null>(null);
+  const [selectedGoal, setSelectedGoal] = useState<number | null>(null);
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
-  const [showGoalDetailsModal, setShowGoalDetailsModal] = useState(false);
-  const [comment, setComment] = useState("");
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
-  
+
   const handleAddEvidence = () => {
     toast({
       title: "Evidência adicionada",
-      description: "Sua evidência foi enviada com sucesso.",
+      description: "Sua evidência foi registrada com sucesso.",
     });
     setShowEvidenceModal(false);
   };
-  
-  const handleMarkAsCompleted = (goalId: number) => {
-    toast({
-      title: "Meta concluída",
-      description: "Parabéns por completar sua meta!",
-    });
+
+  const handleProfilePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result as string);
+        toast({
+          title: "Foto atualizada",
+          description: "Sua foto de perfil foi atualizada com sucesso.",
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   };
-  
-  const handleGoalClick = (goal: typeof goalsData[0]) => {
-    setSelectedGoal(goal);
-    setShowGoalDetailsModal(true);
-  };
-  
-  const handleEvidenceClick = (goal: typeof goalsData[0]) => {
-    setSelectedGoal(goal);
-    setShowEvidenceModal(true);
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
   };
   
   return (
@@ -111,20 +122,33 @@ const PatientDashboard = () => {
                 }`}
               >
                 <User className="h-5 w-5 md:mr-3" />
+                <span className="hidden md:inline">Dashboard</span>
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveTab("goals")}
+                className={`w-full flex items-center px-4 py-3 ${
+                  activeTab === "goals"
+                    ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"
+                    : "hover:bg-secondary-foreground/5"
+                }`}
+              >
+                <CheckCircle className="h-5 w-5 md:mr-3" />
                 <span className="hidden md:inline">Minhas Metas</span>
               </button>
             </li>
             <li>
               <button
-                onClick={() => setActiveTab("progress")}
+                onClick={() => setActiveTab("achievements")}
                 className={`w-full flex items-center px-4 py-3 ${
-                  activeTab === "progress"
+                  activeTab === "achievements"
                     ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"
                     : "hover:bg-secondary-foreground/5"
                 }`}
               >
-                <Check className="h-5 w-5 md:mr-3" />
-                <span className="hidden md:inline">Meu Progresso</span>
+                <Calendar className="h-5 w-5 md:mr-3" />
+                <span className="hidden md:inline">Conquistas</span>
               </button>
             </li>
             <li>
@@ -160,18 +184,26 @@ const PatientDashboard = () => {
         <header className="bg-white shadow-sm p-4">
           <div className="flex justify-between items-center">
             <h1 className="text-xl font-bold">
-              {activeTab === "dashboard" && "Minhas Metas"}
-              {activeTab === "progress" && "Meu Progresso"}
+              {activeTab === "dashboard" && "Dashboard do Paciente"}
+              {activeTab === "goals" && "Minhas Metas"}
+              {activeTab === "achievements" && "Minhas Conquistas"}
               {activeTab === "settings" && "Configurações"}
             </h1>
             
             <div className="flex items-center">
               <div className="mr-4 text-right hidden sm:block">
-                <p className="font-medium">Ana Silva</p>
+                <p className="font-medium">{patientData.name}</p>
                 <p className="text-sm text-gray-600">Paciente</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="font-bold text-gray-700">AS</span>
+              <div 
+                className="h-10 w-10 rounded-full bg-clinic-yellow flex items-center justify-center overflow-hidden"
+                onClick={triggerFileInput}
+              >
+                {profileImage ? (
+                  <img src={profileImage} alt="Perfil" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="font-bold text-black">MS</span>
+                )}
               </div>
             </div>
           </div>
@@ -182,223 +214,271 @@ const PatientDashboard = () => {
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-2">Total de Metas</h2>
-                <p className="text-3xl font-bold">{goalsData.length}</p>
-                <p className="text-sm text-gray-600">Metas atribuídas</p>
+                <h2 className="text-xl font-bold mb-2">Metas Ativas</h2>
+                <p className="text-3xl font-bold">{goalsData.filter(g => g.status !== "completed").length}</p>
+                <p className="text-sm text-gray-600">Total de metas em andamento</p>
               </div>
               
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-2">Em Progresso</h2>
-                <p className="text-3xl font-bold">{goalsData.filter(g => g.status === "in-progress").length}</p>
-                <p className="text-sm text-gray-600">Metas em andamento</p>
-              </div>
-              
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-2">Concluídas</h2>
+                <h2 className="text-xl font-bold mb-2">Metas Concluídas</h2>
                 <p className="text-3xl font-bold">{goalsData.filter(g => g.status === "completed").length}</p>
-                <p className="text-sm text-gray-600">Metas finalizadas</p>
+                <p className="text-sm text-gray-600">Total de metas finalizadas</p>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-xl font-bold mb-2">Conquistas</h2>
+                <p className="text-3xl font-bold">{achievementsData.length}</p>
+                <p className="text-sm text-gray-600">Total de conquistas obtidas</p>
               </div>
             </div>
             
-            <div className="mb-8">
-              <h2 className="text-xl font-bold mb-4">Minhas Metas</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                  <h2 className="text-xl font-bold mb-4">Metas Recentes</h2>
+                  
+                  <div className="space-y-4">
+                    {goalsData.slice(0, 3).map((goal) => (
+                      <div key={goal.id} className="border-l-4 border-clinic-yellow p-4 bg-gray-50 rounded-r-lg">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-bold">{goal.title}</h3>
+                            <p className="text-sm text-gray-600 mt-1">{goal.description}</p>
+                            <p className="text-xs text-gray-500 mt-2">Profissional: {goal.professional}</p>
+                          </div>
+                          {goal.status === "completed" ? (
+                            <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 flex items-center">
+                              <CheckCircle className="h-3 w-3 mr-1" /> Concluída
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setSelectedGoal(goal.id);
+                                setShowEvidenceModal(true);
+                              }}
+                              className="px-2 py-1 text-xs bg-clinic-yellow text-black rounded-md hover:bg-clinic-yellow/90"
+                            >
+                              Registrar Progresso
+                            </button>
+                          )}
+                        </div>
+                        <div className="mt-3">
+                          <div className="flex justify-between text-xs mb-1">
+                            <span>Progresso</span>
+                            <span>{goal.progress}%</span>
+                          </div>
+                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-clinic-yellow"
+                              style={{ width: `${goal.progress}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={() => setActiveTab("goals")}
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      Ver Todas as Metas
+                    </button>
+                  </div>
+                </div>
+              </div>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {goalsData.map((goal) => (
-                  <div key={goal.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 
-                        className="text-lg font-bold hover:text-clinic-yellow cursor-pointer"
-                        onClick={() => handleGoalClick(goal)}
-                      >
-                        {goal.title}
-                      </h3>
-                      <div>
-                        {goal.status === "completed" && (
-                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            <Check className="h-4 w-4 mr-1" /> Concluída
-                          </span>
-                        )}
-                        {goal.status === "in-progress" && (
-                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                            <Clock className="h-4 w-4 mr-1" /> Em Progresso
-                          </span>
-                        )}
-                        {goal.status === "pending" && (
-                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                            <AlertTriangle className="h-4 w-4 mr-1" /> Pendente
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <p className="text-gray-700 mb-4">{goal.description}</p>
-                    
-                    <div className="flex justify-between items-center text-sm mb-4">
-                      <div>
-                        <span className="text-gray-600 mr-2">Prazo:</span>
-                        <span className="font-medium">{goal.dueDate}</span>
-                      </div>
-                      <div>
-                        {goal.priority === "alta" && (
-                          <span className="px-2 py-1 text-xs rounded bg-red-100 text-red-800">
-                            Prioridade Alta
-                          </span>
-                        )}
-                        {goal.priority === "média" && (
-                          <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
-                            Prioridade Média
-                          </span>
-                        )}
-                        {goal.priority === "baixa" && (
-                          <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
-                            Prioridade Baixa
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {goal.feedback && (
-                      <div className="bg-gray-50 p-3 rounded-md mb-4">
-                        <p className="text-sm font-medium mb-1">Feedback do Profissional:</p>
-                        <p className="text-sm text-gray-700">{goal.feedback}</p>
-                      </div>
-                    )}
-                    
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {goal.evidence.map((evidence, index) => (
-                        <div key={index} className="h-16 w-16 rounded-md overflow-hidden">
+              <div>
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Meu Perfil</h2>
+                    <button 
+                      className="text-gray-500 hover:text-gray-700"
+                      onClick={triggerFileInput}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                  </div>
+                  
+                  <div className="flex flex-col items-center">
+                    <div className="relative mb-4">
+                      <div className="h-24 w-24 rounded-full bg-gray-200 overflow-hidden">
+                        {profileImage ? (
                           <img 
-                            src={evidence} 
-                            alt="Evidência" 
+                            src={profileImage} 
+                            alt="Foto de perfil" 
                             className="h-full w-full object-cover"
                           />
-                        </div>
-                      ))}
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center bg-clinic-yellow">
+                            <span className="text-2xl font-bold text-black">
+                              {patientData.name.split(" ").map(n => n[0]).join("")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <button 
+                        className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-200"
+                        onClick={triggerFileInput}
+                      >
+                        <Camera className="h-4 w-4" />
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleProfilePhotoChange}
+                      />
                     </div>
                     
-                    <div className="flex gap-3">
-                      {goal.status !== "completed" && (
-                        <button
-                          className="flex-1 bg-clinic-yellow text-black py-2 rounded-md hover:bg-clinic-yellow/90 flex items-center justify-center"
-                          onClick={() => handleEvidenceClick(goal)}
-                        >
-                          <Camera className="h-4 w-4 mr-2" />
-                          Adicionar Evidência
-                        </button>
-                      )}
-                      
-                      {goal.status === "in-progress" && (
-                        <button
-                          className="flex-1 bg-green-500 text-white py-2 rounded-md hover:bg-green-600 flex items-center justify-center"
-                          onClick={() => handleMarkAsCompleted(goal.id)}
-                        >
-                          <Check className="h-4 w-4 mr-2" />
-                          Marcar como Concluída
-                        </button>
-                      )}
+                    <h3 className="font-bold text-lg">{patientData.name}</h3>
+                    <p className="text-gray-600 text-sm">{patientData.email}</p>
+                    
+                    <div className="w-full mt-4 space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Membro desde:</span>
+                        <span>{patientData.joinedDate}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Total de metas:</span>
+                        <span>{goalsData.length}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Metas concluídas:</span>
+                        <span>{goalsData.filter(g => g.status === "completed").length}</span>
+                      </div>
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
         )}
         
-        {/* Progress Tab */}
-        {activeTab === "progress" && (
+        {/* Goals Tab */}
+        {activeTab === "goals" && (
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-6">Resumo de Progresso</h2>
-                
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="p-4 border-b">
+                <h2 className="text-xl font-bold">Todas as Minhas Metas</h2>
+              </div>
+              
+              <div className="p-4">
                 <div className="space-y-6">
-                  {progressData.map((week, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between mb-1">
-                        <span className="font-medium">{week.week}</span>
-                        <span>{week.completed}/{week.total} concluídas</span>
+                  {goalsData.map((goal) => (
+                    <div 
+                      key={goal.id}
+                      className={`border-l-4 p-4 rounded-r-lg bg-gray-50 ${
+                        goal.status === "completed" 
+                          ? "border-green-500" 
+                          : goal.status === "in-progress"
+                            ? "border-clinic-yellow"
+                            : "border-gray-300"
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-lg">{goal.title}</h3>
+                          <p className="text-gray-600 mt-1">{goal.description}</p>
+                        </div>
+                        
+                        <div>
+                          {goal.status === "completed" ? (
+                            <span className="px-3 py-1 text-sm rounded-full bg-green-100 text-green-800 flex items-center">
+                              <CheckCircle className="h-4 w-4 mr-1" /> Concluída
+                            </span>
+                          ) : goal.status === "in-progress" ? (
+                            <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800 flex items-center">
+                              <Clock className="h-4 w-4 mr-1" /> Em Progresso
+                            </span>
+                          ) : (
+                            <span className="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800 flex items-center">
+                              <AlertCircle className="h-4 w-4 mr-1" /> Pendente
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-clinic-yellow"
-                          style={{ width: `${(week.completed / week.total) * 100}%` }}
-                        ></div>
+                      
+                      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-600">Profissional:</span>
+                          <span className="ml-2">{goal.professional}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Data limite:</span>
+                          <span className="ml-2">{goal.dueDate}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Prioridade:</span>
+                          <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                            goal.priority === "alta" 
+                              ? "bg-red-100 text-red-800" 
+                              : goal.priority === "média"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-green-100 text-green-800"
+                          }`}>
+                            {goal.priority.charAt(0).toUpperCase() + goal.priority.slice(1)}
+                          </span>
+                        </div>
                       </div>
+                      
+                      <div className="mt-4">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span>Progresso</span>
+                          <span>{goal.progress}%</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${goal.status === "completed" ? "bg-green-500" : "bg-clinic-yellow"}`}
+                            style={{ width: `${goal.progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      {goal.status !== "completed" && (
+                        <div className="mt-4">
+                          <button
+                            onClick={() => {
+                              setSelectedGoal(goal.id);
+                              setShowEvidenceModal(true);
+                            }}
+                            className="px-4 py-2 bg-clinic-yellow text-black rounded-md hover:bg-clinic-yellow/90 text-sm"
+                          >
+                            Registrar Progresso
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
-              
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-6">Estatísticas</h2>
-                
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-clinic-yellow">82%</div>
-                    <div className="text-sm text-gray-600">Taxa de Conclusão</div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-clinic-yellow">14</div>
-                    <div className="text-sm text-gray-600">Total de Metas Concluídas</div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-clinic-yellow">4</div>
-                    <div className="text-sm text-gray-600">Semanas de Atividade</div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-clinic-yellow">3.5</div>
-                    <div className="text-sm text-gray-600">Metas Semanais em Média</div>
-                  </div>
-                </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Achievements Tab */}
+        {activeTab === "achievements" && (
+          <div className="p-6">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="p-4 border-b">
+                <h2 className="text-xl font-bold">Minhas Conquistas</h2>
               </div>
               
-              <div className="bg-white rounded-lg shadow-sm p-6 md:col-span-2">
-                <h2 className="text-xl font-bold mb-6">Histórico de Atividades</h2>
-                
+              <div className="p-4">
                 <div className="space-y-4">
-                  <div className="flex items-start border-l-4 border-green-500 pl-4 py-2">
-                    <div className="mr-4">
-                      <div className="text-sm text-gray-500">12/11/2023</div>
+                  {achievementsData.map((achievement) => (
+                    <div key={achievement.id} className="bg-gray-50 rounded-lg p-4 border-l-4 border-clinic-yellow">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold">{achievement.title}</h3>
+                          <p className="text-sm text-gray-600 mt-1">{achievement.description}</p>
+                        </div>
+                        <div className="text-sm text-gray-500">{achievement.date}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium">Meta "Prática de Mindfulness" concluída</div>
-                      <div className="text-sm text-gray-600">Você concluiu a meta e recebeu feedback positivo do profissional.</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start border-l-4 border-blue-500 pl-4 py-2">
-                    <div className="mr-4">
-                      <div className="text-sm text-gray-500">10/11/2023</div>
-                    </div>
-                    <div>
-                      <div className="font-medium">Evidência adicionada para "Caminhada diária"</div>
-                      <div className="text-sm text-gray-600">Você adicionou uma foto como evidência para sua meta.</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start border-l-4 border-yellow-500 pl-4 py-2">
-                    <div className="mr-4">
-                      <div className="text-sm text-gray-500">08/11/2023</div>
-                    </div>
-                    <div>
-                      <div className="font-medium">Nova meta atribuída</div>
-                      <div className="text-sm text-gray-600">O profissional atribuiu a meta "Exercícios de Respiração" para você.</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start border-l-4 border-green-500 pl-4 py-2">
-                    <div className="mr-4">
-                      <div className="text-sm text-gray-500">05/11/2023</div>
-                    </div>
-                    <div>
-                      <div className="font-medium">Meta "Leitura Diária" concluída</div>
-                      <div className="text-sm text-gray-600">Você concluiu a meta dentro do prazo estabelecido.</div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -409,7 +489,51 @@ const PatientDashboard = () => {
         {activeTab === "settings" && (
           <div className="p-6">
             <div className="bg-white rounded-lg shadow-sm p-6 max-w-2xl">
-              <h2 className="text-xl font-bold mb-6">Perfil do Paciente</h2>
+              <h2 className="text-xl font-bold mb-6">Meu Perfil</h2>
+              
+              <div className="flex mb-6 items-center">
+                <div className="relative mr-6">
+                  <div className="h-24 w-24 rounded-full bg-gray-200 overflow-hidden">
+                    {profileImage ? (
+                      <img 
+                        src={profileImage} 
+                        alt="Foto de perfil" 
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center bg-clinic-yellow">
+                        <span className="text-2xl font-bold text-black">
+                          {patientData.name.split(" ").map(n => n[0]).join("")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <button 
+                    className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-200"
+                    onClick={triggerFileInput}
+                  >
+                    <Camera className="h-4 w-4" />
+                  </button>
+                </div>
+                
+                <div>
+                  <h3 className="font-bold text-lg">{patientData.name}</h3>
+                  <p className="text-gray-600 text-sm">{patientData.email}</p>
+                  <button 
+                    className="mt-2 text-sm text-blue-600 hover:underline"
+                    onClick={triggerFileInput}
+                  >
+                    Alterar foto de perfil
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleProfilePhotoChange}
+                  />
+                </div>
+              </div>
               
               <div className="space-y-6">
                 <div>
@@ -420,7 +544,7 @@ const PatientDashboard = () => {
                     type="text"
                     id="name"
                     className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
-                    defaultValue="Ana Silva"
+                    defaultValue={patientData.name}
                   />
                 </div>
                 
@@ -432,43 +556,32 @@ const PatientDashboard = () => {
                     type="email"
                     id="email"
                     className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
-                    defaultValue="ana@email.com"
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Telefone
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
-                    defaultValue="(00) 00000-0000"
+                    defaultValue={patientData.email}
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Nova Senha
+                    Senha
                   </label>
                   <input
                     type="password"
                     id="password"
                     className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
-                    placeholder="Deixe em branco para manter a senha atual"
+                    placeholder="••••••••"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Deixe em branco para manter a senha atual</p>
                 </div>
                 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                    Confirmar Nova Senha
+                  <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700 mb-1">
+                    Confirmar Senha
                   </label>
                   <input
                     type="password"
-                    id="confirmPassword"
+                    id="passwordConfirm"
                     className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
-                    placeholder="Deixe em branco para manter a senha atual"
+                    placeholder="••••••••"
                   />
                 </div>
                 
@@ -477,12 +590,10 @@ const PatientDashboard = () => {
                     <input
                       type="checkbox"
                       id="notifications"
-                      className="mr-2"
+                      className="h-4 w-4 text-clinic-yellow focus:ring-clinic-yellow border-gray-300 rounded mr-2"
                       defaultChecked
                     />
-                    <span className="text-sm font-medium text-gray-700">
-                      Receber notificações por email
-                    </span>
+                    <span className="text-sm text-gray-700">Receber notificações por email</span>
                   </label>
                 </div>
                 
@@ -497,52 +608,67 @@ const PatientDashboard = () => {
         )}
       </div>
       
-      {/* Evidence Modal */}
-      {showEvidenceModal && selectedGoal && (
+      {/* Add Evidence Modal */}
+      {showEvidenceModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">
-              Adicionar Evidência: {selectedGoal.title}
-            </h2>
+            <h2 className="text-xl font-bold mb-4">Registrar Progresso</h2>
             
             <form onSubmit={(e) => { e.preventDefault(); handleAddEvidence(); }}>
               <div className="mb-4">
-                <label htmlFor="evidence" className="block text-sm font-medium text-gray-700 mb-1">
-                  Foto ou Imagem
+                <label htmlFor="progressDescription" className="block text-sm font-medium text-gray-700 mb-1">
+                  Descrição do Progresso
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                  <Camera className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-1 text-sm text-gray-600">
-                    Clique para adicionar ou arraste uma imagem
-                  </p>
-                  <input
-                    type="file"
-                    id="evidence"
-                    className="hidden"
-                    accept="image/*"
-                  />
-                  <button
-                    type="button"
-                    className="mt-2 bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm"
-                    onClick={() => document.getElementById("evidence")?.click()}
-                  >
-                    Escolher Arquivo
-                  </button>
+                <textarea
+                  id="progressDescription"
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
+                  placeholder="Descreva seu progresso..."
+                  rows={3}
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="photoEvidence" className="block text-sm font-medium text-gray-700 mb-1">
+                  Foto da Evidência (opcional)
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
+                  <div className="flex flex-col items-center">
+                    <Camera className="h-8 w-8 text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-500">Arraste uma imagem ou clique para selecionar</p>
+                    <input
+                      type="file"
+                      id="photoEvidence"
+                      className="hidden"
+                      accept="image/*"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById("photoEvidence")?.click()}
+                      className="mt-2 text-sm text-blue-600 hover:underline"
+                    >
+                      Selecionar arquivo
+                    </button>
+                  </div>
                 </div>
               </div>
               
               <div className="mb-4">
-                <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
-                  Comentário (opcional)
+                <label htmlFor="progressPercentage" className="block text-sm font-medium text-gray-700 mb-1">
+                  Porcentagem de Conclusão
                 </label>
-                <textarea
-                  id="comment"
-                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
-                  placeholder="Adicione um comentário sobre sua atividade..."
-                  rows={3}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                />
+                <div className="flex items-center">
+                  <input
+                    type="range"
+                    id="progressPercentage"
+                    min="0"
+                    max="100"
+                    step="10"
+                    defaultValue="50"
+                    className="w-full mr-2"
+                  />
+                  <span id="progressValue" className="text-sm">50%</span>
+                </div>
               </div>
               
               <div className="flex justify-end gap-3">
@@ -555,141 +681,12 @@ const PatientDashboard = () => {
                 </button>
                 <button
                   type="submit"
-                  className="bg-clinic-yellow text-black px-4 py-2 rounded-md hover:bg-clinic-yellow/90 flex items-center"
+                  className="bg-clinic-yellow text-black px-4 py-2 rounded-md hover:bg-clinic-yellow/90"
                 >
-                  <Send className="h-4 w-4 mr-2" />
-                  Enviar Evidência
+                  Salvar Progresso
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-      
-      {/* Goal Details Modal */}
-      {showGoalDetailsModal && selectedGoal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start mb-4">
-              <h2 className="text-xl font-bold">{selectedGoal.title}</h2>
-              <button
-                onClick={() => setShowGoalDetailsModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                &times;
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <h3 className="font-bold mb-2">Detalhes da Meta</h3>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-600">Descrição:</p>
-                    <p>{selectedGoal.description}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Data Limite:</p>
-                    <p className="font-medium">{selectedGoal.dueDate}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Prioridade:</p>
-                    <p>
-                      {selectedGoal.priority === "alta" && (
-                        <span className="px-2 py-1 text-xs rounded bg-red-100 text-red-800">
-                          Alta
-                        </span>
-                      )}
-                      {selectedGoal.priority === "média" && (
-                        <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
-                          Média
-                        </span>
-                      )}
-                      {selectedGoal.priority === "baixa" && (
-                        <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
-                          Baixa
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Status:</p>
-                    <p>
-                      {selectedGoal.status === "completed" && (
-                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          <Check className="h-4 w-4 mr-1" /> Concluída
-                        </span>
-                      )}
-                      {selectedGoal.status === "in-progress" && (
-                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                          <Clock className="h-4 w-4 mr-1" /> Em Progresso
-                        </span>
-                      )}
-                      {selectedGoal.status === "pending" && (
-                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                          <AlertTriangle className="h-4 w-4 mr-1" /> Pendente
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="font-bold mb-2">Feedback e Evidências</h3>
-                {selectedGoal.feedback ? (
-                  <div className="bg-gray-50 p-3 rounded-md mb-4">
-                    <p className="text-sm font-medium mb-1">Feedback do Profissional:</p>
-                    <p className="text-sm">{selectedGoal.feedback}</p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-600 mb-4">
-                    Nenhum feedback fornecido ainda.
-                  </p>
-                )}
-                
-                <h4 className="font-medium mb-2">Evidências:</h4>
-                {selectedGoal.evidence.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-2">
-                    {selectedGoal.evidence.map((evidence, index) => (
-                      <div key={index} className="rounded-md overflow-hidden">
-                        <img 
-                          src={evidence} 
-                          alt="Evidência" 
-                          className="w-full h-32 object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-600">
-                    Nenhuma evidência adicionada ainda.
-                  </p>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex gap-3 justify-end">
-              <button
-                className="px-4 py-2 border rounded-md"
-                onClick={() => setShowGoalDetailsModal(false)}
-              >
-                Fechar
-              </button>
-              
-              {selectedGoal.status !== "completed" && (
-                <button
-                  className="bg-clinic-yellow text-black px-4 py-2 rounded-md hover:bg-clinic-yellow/90 flex items-center"
-                  onClick={() => {
-                    setShowGoalDetailsModal(false);
-                    setShowEvidenceModal(true);
-                  }}
-                >
-                  <Camera className="h-4 w-4 mr-2" />
-                  Adicionar Evidência
-                </button>
-              )}
-            </div>
           </div>
         </div>
       )}

@@ -65,12 +65,44 @@ const goalsData = [
   },
 ];
 
+// Goal templates organized by categories
+const goalTemplates = {
+  "Exercício Físico": [
+    { title: "Caminhada Diária", description: "Caminhar por pelo menos 30 minutos todos os dias." },
+    { title: "Treino de Força", description: "Realizar exercícios de força 3 vezes por semana." },
+    { title: "Alongamento", description: "Fazer uma rotina de alongamento por 15 minutos diariamente." }
+  ],
+  "Lifestyle": [
+    { title: "Meditação", description: "Praticar meditação por 10 minutos todas as manhãs." },
+    { title: "Leitura", description: "Ler um livro por 20 minutos antes de dormir." },
+    { title: "Organização", description: "Dedicar 15 minutos por dia para organizar o ambiente." }
+  ],
+  "Finanças": [
+    { title: "Controle de Gastos", description: "Registrar todos os gastos diários em um aplicativo." },
+    { title: "Economias", description: "Separar 10% da renda mensal para poupança." }
+  ],
+  "Nutrição": [
+    { title: "Hidratação", description: "Beber pelo menos 2 litros de água por dia." },
+    { title: "Frutas e Vegetais", description: "Consumir 5 porções de frutas e vegetais diariamente." },
+    { title: "Planejamento de Refeições", description: "Planejar as refeições da semana com antecedência." }
+  ],
+  "Saúde Mental": [
+    { title: "Diário", description: "Escrever 3 coisas positivas que aconteceram no dia." },
+    { title: "Limites", description: "Praticar dizer 'não' quando necessário." },
+    { title: "Desconexão", description: "Passar 1 hora por dia sem dispositivos eletrônicos." }
+  ]
+};
+
 const ProfessionalDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [patientSearchTerm, setPatientSearchTerm] = useState("");
   const [showAddPatientModal, setShowAddPatientModal] = useState(false);
   const [showAddGoalModal, setShowAddGoalModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<number | null>(null);
+  const [selectedPatients, setSelectedPatients] = useState<number[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<{title: string, description: string} | null>(null);
+  const [isGroupGoal, setIsGroupGoal] = useState(false);
   
   const { toast } = useToast();
   
@@ -89,16 +121,46 @@ const ProfessionalDashboard = () => {
   };
   
   const handleAddGoal = () => {
+    const message = isGroupGoal 
+      ? `Meta criada para ${selectedPatients.length} pacientes`
+      : "Meta criada para o paciente";
+      
     toast({
       title: "Meta criada",
-      description: "A meta foi criada e atribuída com sucesso.",
+      description: message,
     });
     setShowAddGoalModal(false);
+    setSelectedPatients([]);
+    setIsGroupGoal(false);
+    setSelectedCategory(null);
+    setSelectedTemplate(null);
+  };
+  
+  const handleTogglePatientSelection = (patientId: number) => {
+    setSelectedPatients(prev => {
+      if (prev.includes(patientId)) {
+        return prev.filter(id => id !== patientId);
+      } else {
+        return [...prev, patientId];
+      }
+    });
   };
   
   const handlePatientSelect = (patientId: number) => {
     setSelectedPatient(patientId);
+    setSelectedPatients([patientId]);
+    setIsGroupGoal(false);
     setShowAddGoalModal(true);
+  };
+
+  const handleOpenGroupGoalModal = () => {
+    setSelectedPatient(null);
+    setIsGroupGoal(true);
+    setShowAddGoalModal(true);
+  };
+  
+  const handleSelectTemplate = (title: string, description: string) => {
+    setSelectedTemplate({ title, description });
   };
   
   return (
@@ -216,13 +278,22 @@ const ProfessionalDashboard = () => {
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Metas Recentes</h2>
-                <button
-                  className="flex items-center text-sm bg-clinic-yellow text-black px-3 py-1.5 rounded-md hover:bg-clinic-yellow/90"
-                  onClick={() => setShowAddGoalModal(true)}
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Nova Meta
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    className="flex items-center text-sm bg-clinic-yellow text-black px-3 py-1.5 rounded-md hover:bg-clinic-yellow/90"
+                    onClick={() => setShowAddGoalModal(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Nova Meta Individual
+                  </button>
+                  <button
+                    className="flex items-center text-sm bg-secondary text-white px-3 py-1.5 rounded-md hover:bg-secondary/90"
+                    onClick={handleOpenGroupGoalModal}
+                  >
+                    <Users className="h-4 w-4 mr-1" />
+                    Nova Meta em Grupo
+                  </button>
+                </div>
               </div>
               
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -370,19 +441,33 @@ const ProfessionalDashboard = () => {
                 />
               </div>
               
-              <button
-                className="flex items-center bg-clinic-yellow text-black px-4 py-2 rounded-md hover:bg-clinic-yellow/90"
-                onClick={() => setShowAddPatientModal(true)}
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Adicionar Paciente
-              </button>
+              <div className="flex gap-2">
+                <button
+                  className="flex items-center bg-clinic-yellow text-black px-4 py-2 rounded-md hover:bg-clinic-yellow/90"
+                  onClick={() => setShowAddPatientModal(true)}
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  Adicionar Paciente
+                </button>
+                <button
+                  className="flex items-center bg-secondary text-white px-4 py-2 rounded-md hover:bg-secondary/90"
+                  onClick={handleOpenGroupGoalModal}
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  Meta em Grupo
+                </button>
+              </div>
             </div>
             
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
+                    {isGroupGoal && (
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Selecionar
+                      </th>
+                    )}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Paciente
                     </th>
@@ -403,6 +488,16 @@ const ProfessionalDashboard = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredPatients.map((patient) => (
                     <tr key={patient.id} className="hover:bg-gray-50">
+                      {isGroupGoal && (
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input 
+                            type="checkbox"
+                            className="h-4 w-4 text-clinic-yellow focus:ring-clinic-yellow border-gray-300 rounded"
+                            checked={selectedPatients.includes(patient.id)}
+                            onChange={() => handleTogglePatientSelection(patient.id)}
+                          />
+                        </td>
+                      )}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
@@ -600,25 +695,104 @@ const ProfessionalDashboard = () => {
       {showAddGoalModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Criar Nova Meta</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {isGroupGoal ? "Criar Meta em Grupo" : "Criar Nova Meta"}
+            </h2>
             
             <form onSubmit={(e) => { e.preventDefault(); handleAddGoal(); }}>
+              {isGroupGoal ? (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Pacientes Selecionados ({selectedPatients.length})
+                  </label>
+                  <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-gray-50">
+                    {selectedPatients.length > 0 ? (
+                      patientsData
+                        .filter(p => selectedPatients.includes(p.id))
+                        .map(patient => (
+                          <span key={patient.id} className="px-2 py-1 bg-gray-200 text-xs rounded-md">
+                            {patient.name}
+                          </span>
+                        ))
+                    ) : (
+                      <span className="text-gray-500 text-sm">Nenhum paciente selecionado</span>
+                    )}
+                  </div>
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      className="text-sm text-blue-600 hover:underline"
+                      onClick={() => {
+                        setShowAddGoalModal(false);
+                        setActiveTab("patients");
+                      }}
+                    >
+                      Ir para lista de pacientes
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-4">
+                  <label htmlFor="goalPatient" className="block text-sm font-medium text-gray-700 mb-1">
+                    Paciente
+                  </label>
+                  <select
+                    id="goalPatient"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
+                    defaultValue={selectedPatient || ""}
+                    required
+                  >
+                    <option value="" disabled>Selecione um paciente</option>
+                    {patientsData.map(patient => (
+                      <option key={patient.id} value={patient.id}>{patient.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              
               <div className="mb-4">
-                <label htmlFor="goalPatient" className="block text-sm font-medium text-gray-700 mb-1">
-                  Paciente
+                <label htmlFor="goalCategory" className="block text-sm font-medium text-gray-700 mb-1">
+                  Categoria da Meta
                 </label>
                 <select
-                  id="goalPatient"
+                  id="goalCategory"
                   className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
-                  defaultValue={selectedPatient || ""}
-                  required
+                  value={selectedCategory || ""}
+                  onChange={(e) => setSelectedCategory(e.target.value || null)}
                 >
-                  <option value="" disabled>Selecione um paciente</option>
-                  {patientsData.map(patient => (
-                    <option key={patient.id} value={patient.id}>{patient.name}</option>
+                  <option value="">Meta Personalizada</option>
+                  {Object.keys(goalTemplates).map(category => (
+                    <option key={category} value={category}>{category}</option>
                   ))}
                 </select>
               </div>
+              
+              {selectedCategory && (
+                <div className="mb-4">
+                  <label htmlFor="goalTemplate" className="block text-sm font-medium text-gray-700 mb-1">
+                    Modelo de Meta
+                  </label>
+                  <select
+                    id="goalTemplate"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
+                    onChange={(e) => {
+                      const templates = goalTemplates[selectedCategory as keyof typeof goalTemplates];
+                      const selectedTemplateIndex = parseInt(e.target.value);
+                      if (selectedTemplateIndex >= 0) {
+                        const template = templates[selectedTemplateIndex];
+                        handleSelectTemplate(template.title, template.description);
+                      }
+                    }}
+                  >
+                    <option value="">Selecione um modelo</option>
+                    {goalTemplates[selectedCategory as keyof typeof goalTemplates].map((template, index) => (
+                      <option key={index} value={index}>
+                        {template.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               
               <div className="mb-4">
                 <label htmlFor="goalTitle" className="block text-sm font-medium text-gray-700 mb-1">
@@ -630,6 +804,8 @@ const ProfessionalDashboard = () => {
                   className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow"
                   placeholder="Título da meta"
                   required
+                  value={selectedTemplate?.title || ""}
+                  onChange={(e) => setSelectedTemplate(prev => prev ? {...prev, title: e.target.value} : null)}
                 />
               </div>
               
@@ -643,6 +819,8 @@ const ProfessionalDashboard = () => {
                   placeholder="Descrição detalhada da meta"
                   rows={3}
                   required
+                  value={selectedTemplate?.description || ""}
+                  onChange={(e) => setSelectedTemplate(prev => prev ? {...prev, description: e.target.value} : null)}
                 />
               </div>
               
@@ -679,13 +857,17 @@ const ProfessionalDashboard = () => {
                 <button
                   type="button"
                   className="px-4 py-2 border rounded-md"
-                  onClick={() => setShowAddGoalModal(false)}
+                  onClick={() => {
+                    setShowAddGoalModal(false);
+                    setIsGroupGoal(false);
+                  }}
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   className="bg-clinic-yellow text-black px-4 py-2 rounded-md hover:bg-clinic-yellow/90"
+                  disabled={isGroupGoal && selectedPatients.length === 0}
                 >
                   Criar Meta
                 </button>
