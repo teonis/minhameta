@@ -1,5 +1,7 @@
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Sparkles } from "lucide-react";
 
 type HeaderProps = {
   activeTab: string;
@@ -7,9 +9,10 @@ type HeaderProps = {
   currentPatient?: {
     name: string;
   } | null;
+  onOpenAIAssistant: () => void;
 }
 
-const ProfessionalHeader = ({ activeTab, viewingPatientDetails, currentPatient }: HeaderProps) => {
+const ProfessionalHeader = ({ activeTab, viewingPatientDetails, currentPatient, onOpenAIAssistant }: HeaderProps) => {
   return (
     <header className="bg-white shadow-sm p-4">
       <div className="flex justify-between items-center">
@@ -24,6 +27,15 @@ const ProfessionalHeader = ({ activeTab, viewingPatientDetails, currentPatient }
         </div>
         
         <div className="flex items-center">
+          <Button 
+            variant="outline" 
+            className="mr-4 hidden sm:flex items-center gap-1 border-clinic-yellow text-clinic-black hover:bg-clinic-yellow/10"
+            onClick={onOpenAIAssistant}
+          >
+            <Sparkles className="h-4 w-4 text-clinic-yellow" />
+            Assistente IA
+          </Button>
+          
           <div className="mr-4 text-right hidden sm:block">
             <p className="font-medium">Tay Rocha</p>
             <p className="text-sm text-gray-600">Profissional</p>

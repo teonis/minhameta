@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { ArrowLeft, Calendar, Book, Check, Clock, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Calendar, Book, Check, Clock, AlertTriangle, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type PatientType = {
   id: number;
@@ -33,13 +34,15 @@ type PatientDetailsViewProps = {
   patientGoals: GoalType[];
   onBackToPatientsList: () => void;
   onAddGoal: (patientId: number) => void;
+  onOpenAIAssistant?: (patientId: number, patientName: string, patientGoals: GoalType[]) => void;
 };
 
 const PatientDetailsView = ({
   currentPatient,
   patientGoals,
   onBackToPatientsList,
-  onAddGoal
+  onAddGoal,
+  onOpenAIAssistant
 }: PatientDetailsViewProps) => {
   const [activePatientTab, setActivePatientTab] = useState("goals");
 
@@ -71,13 +74,26 @@ const PatientDetailsView = ({
             </div>
           </div>
           
-          <button
-            className="bg-clinic-yellow text-black px-4 py-2 rounded-md hover:bg-clinic-yellow/90"
-            onClick={() => onAddGoal(currentPatient.id)}
-          >
-            <span className="mr-1">+</span>
-            Nova Meta
-          </button>
+          <div className="flex gap-2">
+            {onOpenAIAssistant && (
+              <Button
+                variant="outline"
+                className="border-clinic-yellow text-clinic-black hover:bg-clinic-yellow/10"
+                onClick={() => onOpenAIAssistant(currentPatient.id, currentPatient.name, patientGoals)}
+              >
+                <Sparkles className="h-4 w-4 mr-1 text-clinic-yellow" />
+                Assistente IA
+              </Button>
+            )}
+            
+            <button
+              className="bg-clinic-yellow text-black px-4 py-2 rounded-md hover:bg-clinic-yellow/90"
+              onClick={() => onAddGoal(currentPatient.id)}
+            >
+              <span className="mr-1">+</span>
+              Nova Meta
+            </button>
+          </div>
         </div>
         
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">

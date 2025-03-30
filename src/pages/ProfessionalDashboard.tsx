@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import ProfessionalSidebar from "@/components/professional/ProfessionalSidebar";
@@ -9,6 +8,7 @@ import PatientDetailsView from "@/components/professional/PatientDetailsView";
 import SettingsView from "@/components/professional/SettingsView";
 import AddPatientModal from "@/components/professional/AddPatientModal";
 import AddGoalModal from "@/components/professional/AddGoalModal";
+import AIAssistantModal from "@/components/professional/AIAssistantModal";
 
 // Simulated data - would be fetched from backend in real app
 const patientsData = [
@@ -137,10 +137,16 @@ const ProfessionalDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showAddPatientModal, setShowAddPatientModal] = useState(false);
   const [showAddGoalModal, setShowAddGoalModal] = useState(false);
+  const [showAIAssistantModal, setShowAIAssistantModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<number | null>(null);
   const [selectedPatients, setSelectedPatients] = useState<number[]>([]);
   const [isGroupGoal, setIsGroupGoal] = useState(false);
   const [viewingPatientDetails, setViewingPatientDetails] = useState(false);
+  const [aiAssistantContext, setAiAssistantContext] = useState<{
+    patientId?: number;
+    patientName?: string;
+    patientGoals?: any[];
+  }>({});
   
   const handleAddPatient = () => {
     setShowAddPatientModal(false);
@@ -185,6 +191,15 @@ const ProfessionalDashboard = () => {
     setSelectedPatient(null);
   };
 
+  const handleOpenAIAssistant = (patientId?: number, patientName?: string, patientGoals?: any[]) => {
+    setAiAssistantContext({
+      patientId,
+      patientName,
+      patientGoals
+    });
+    setShowAIAssistantModal(true);
+  };
+
   const currentPatient = selectedPatient ? patientsData.find(p => p.id === selectedPatient) : null;
   const patientGoals = selectedPatient ? goalsData.filter(g => g.patientId === selectedPatient) : [];
   
@@ -197,7 +212,8 @@ const ProfessionalDashboard = () => {
           <ProfessionalHeader 
             activeTab={activeTab} 
             viewingPatientDetails={viewingPatientDetails} 
-            currentPatient={currentPatient} 
+            currentPatient={currentPatient}
+            onOpenAIAssistant={() => handleOpenAIAssistant()}
           />
           
           {activeTab === "dashboard" && (
@@ -230,6 +246,7 @@ const ProfessionalDashboard = () => {
               patientGoals={patientGoals}
               onBackToPatientsList={handleBackToPatientsList}
               onAddGoal={handlePatientSelect}
+              onOpenAIAssistant={handleOpenAIAssistant}
             />
           )}
           
@@ -253,6 +270,16 @@ const ProfessionalDashboard = () => {
           selectedPatient={selectedPatient}
           isGroupGoal={isGroupGoal}
           selectedPatients={selectedPatients}
+        />
+      )}
+      
+      {showAIAssistantModal && (
+        <AIAssistantModal
+          isOpen={showAIAssistantModal}
+          onClose={() => setShowAIAssistantModal(false)}
+          patientId={aiAssistantContext.patientId}
+          patientName={aiAssistantContext.patientName}
+          patientGoals={aiAssistantContext.patientGoals}
         />
       )}
     </SidebarProvider>
