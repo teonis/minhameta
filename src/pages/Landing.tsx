@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Check, Calendar, User, Sparkles } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -92,7 +91,7 @@ const Landing = () => {
           </div>
         </section>
         
-        {/* Benefits Section - Fresher look with better image */}
+        {/* Benefits Section - Updated with the new image */}
         <section className="py-24 bg-gray-50">
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -103,35 +102,35 @@ const Landing = () => {
                     <Check className="text-clinic-yellow mr-3 mt-1 flex-shrink-0" />
                     <div>
                       <p className="font-medium">Clareza nos objetivos terapêuticos</p>
-                      <p className="text-gray-600 text-sm">Metas bem definidas e mensuráveis pela equipe da Clínica Rocha</p>
+                      <p className="text-gray-600 text-sm">Metas bem definidas e mensuráveis</p>
                     </div>
                   </li>
                   <li className="flex items-start bg-white p-4 rounded-lg shadow-sm">
                     <Check className="text-clinic-yellow mr-3 mt-1 flex-shrink-0" />
                     <div>
                       <p className="font-medium">Engajamento</p>
-                      <p className="text-gray-600 text-sm">Maior participação e comprometimento dos pacientes da Clínica Rocha</p>
+                      <p className="text-gray-600 text-sm">Maior participação e comprometimento dos pacientes</p>
                     </div>
                   </li>
                   <li className="flex items-start bg-white p-4 rounded-lg shadow-sm">
                     <Check className="text-clinic-yellow mr-3 mt-1 flex-shrink-0" />
                     <div>
                       <p className="font-medium">Acompanhamento contínuo</p>
-                      <p className="text-gray-600 text-sm">Feedback regular entre sessões terapêuticas com os profissionais</p>
+                      <p className="text-gray-600 text-sm">Feedback regular entre sessões terapêuticas</p>
                     </div>
                   </li>
                   <li className="flex items-start bg-white p-4 rounded-lg shadow-sm">
                     <Check className="text-clinic-yellow mr-3 mt-1 flex-shrink-0" />
                     <div>
                       <p className="font-medium">Análise de progresso</p>
-                      <p className="text-gray-600 text-sm">Visualização clara da evolução ao longo do tratamento na Clínica Rocha</p>
+                      <p className="text-gray-600 text-sm">Visualização clara da evolução ao longo do tratamento</p>
                     </div>
                   </li>
                 </ul>
               </div>
               <div>
                 <img 
-                  src="/lovable-uploads/643359a4-2048-486f-a9b1-023915bdd3a7.png" 
+                  src="/lovable-uploads/8e2aa498-0d65-4ede-805c-f77f7bdc4e89.png" 
                   alt="Paciente feliz se exercitando usando o aplicativo Minha Meta" 
                   className="rounded-xl shadow-xl object-cover h-[500px] w-full" 
                 />

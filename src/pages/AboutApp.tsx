@@ -21,16 +21,16 @@ const AboutApp = () => {
           </div>
         </section>
         
-        {/* Overview Section */}
+        {/* Overview Section - Updated with new group image */}
         <section className="py-16">
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-3xl font-bold mb-6">O que é o Minha Meta?</h2>
                 <p className="mb-4">
-                  O Minha Meta é uma plataforma web desenvolvida especialmente para
-                  a Clínica Rocha, que permite aos profissionais criar, atribuir e
-                  monitorar metas semanais personalizadas para seus pacientes.
+                  O Minha Meta é uma plataforma web que permite aos profissionais 
+                  criar, atribuir e monitorar metas semanais personalizadas para 
+                  seus pacientes.
                 </p>
                 <p className="mb-4">
                   Com um sistema intuitivo e interativo, profissionais e pacientes
@@ -45,9 +45,9 @@ const AboutApp = () => {
               </div>
               <div>
                 <img
-                  src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6"
-                  alt="Aplicativo Minha Meta"
-                  className="rounded-lg shadow-lg"
+                  src="/lovable-uploads/eb79d86c-bf67-47ab-bb48-6aa1677247f9.png"
+                  alt="Grupo de pessoas em treinamento usando o Minha Meta"
+                  className="rounded-lg shadow-lg w-full h-auto"
                 />
               </div>
             </div>
