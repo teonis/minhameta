@@ -1,12 +1,9 @@
-
 import { Link } from "react-router-dom";
 import { Check, Calendar, User } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
 const Landing = () => {
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-grow">
@@ -33,11 +30,7 @@ const Landing = () => {
                 </div>
               </div>
               <div className="hidden md:block">
-                <img
-                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
-                  alt="Profissional usando o Minha Meta"
-                  className="rounded-lg shadow-lg"
-                />
+                <img alt="Profissional usando o Minha Meta" className="rounded-lg shadow-lg object-scale-down" src="/lovable-uploads/b31f6405-fca3-414f-afab-1a5e8a746dd6.jpg" />
               </div>
             </div>
           </div>
@@ -123,11 +116,7 @@ const Landing = () => {
                 </ul>
               </div>
               <div>
-                <img
-                  src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7"
-                  alt="Paciente usando o aplicativo Minha Meta"
-                  className="rounded-lg shadow-lg"
-                />
+                <img src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7" alt="Paciente usando o aplicativo Minha Meta" className="rounded-lg shadow-lg" />
               </div>
             </div>
           </div>
@@ -149,8 +138,6 @@ const Landing = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;
