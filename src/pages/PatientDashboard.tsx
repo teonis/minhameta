@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { 
   LogOut, 
   User, 
+  Users,  // Adding the Users icon import
   Settings, 
   Calendar, 
   CheckCircle, 
