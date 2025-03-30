@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -10,16 +9,64 @@ import {
   Search, 
   Check, 
   Clock, 
-  AlertTriangle 
+  AlertTriangle,
+  ArrowLeft,
+  Calendar,
+  Book
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Simulated data - would be fetched from backend in real app
 const patientsData = [
-  { id: 1, name: "Ana Silva", email: "ana@email.com", lastActivity: "2 dias atrás", totalGoals: 8, completedGoals: 5 },
-  { id: 2, name: "Carlos Oliveira", email: "carlos@email.com", lastActivity: "Hoje", totalGoals: 6, completedGoals: 4 },
-  { id: 3, name: "Mariana Santos", email: "mariana@email.com", lastActivity: "5 dias atrás", totalGoals: 10, completedGoals: 3 },
-  { id: 4, name: "Bruno Costa", email: "bruno@email.com", lastActivity: "1 semana atrás", totalGoals: 7, completedGoals: 7 },
+  { 
+    id: 1, 
+    name: "Ana Silva", 
+    email: "ana@email.com", 
+    phone: "(11) 98765-4321",
+    lastActivity: "2 dias atrás", 
+    totalGoals: 8, 
+    completedGoals: 5,
+    diaryEntries: [
+      { id: 1, date: "10/11/2023", mood: "Bem", content: "Hoje foi um bom dia. Consegui realizar todos os exercícios propostos e me senti mais disposta." },
+      { id: 2, date: "09/11/2023", mood: "Cansada", content: "Tive dificuldade para dormir ontem à noite, o que afetou minha energia hoje. Mesmo assim, fiz a caminhada recomendada." }
+    ]
+  },
+  { 
+    id: 2, 
+    name: "Carlos Oliveira", 
+    email: "carlos@email.com", 
+    phone: "(11) 91234-5678",
+    lastActivity: "Hoje", 
+    totalGoals: 6, 
+    completedGoals: 4,
+    diaryEntries: [
+      { id: 1, date: "11/11/2023", mood: "Motivado", content: "Consegui completar duas metas hoje! Estou me sentindo muito bem com o progresso." }
+    ]
+  },
+  { 
+    id: 3, 
+    name: "Mariana Santos", 
+    email: "mariana@email.com", 
+    phone: "(11) 99876-5432",
+    lastActivity: "5 dias atrás", 
+    totalGoals: 10, 
+    completedGoals: 3,
+    diaryEntries: [
+      { id: 1, date: "06/11/2023", mood: "Ansiosa", content: "Estou sentindo um pouco de ansiedade hoje. Tentei fazer os exercícios de respiração, mas tive dificuldade de concentração." }
+    ]
+  },
+  { 
+    id: 4, 
+    name: "Bruno Costa", 
+    email: "bruno@email.com", 
+    phone: "(11) 95678-1234",
+    lastActivity: "1 semana atrás", 
+    totalGoals: 7, 
+    completedGoals: 7,
+    diaryEntries: [
+      { id: 1, date: "04/11/2023", mood: "Realizado", content: "Completei todas as minhas metas! Estou muito feliz com meu progresso até agora." }
+    ]
+  },
 ];
 
 const goalsData = [
@@ -65,7 +112,6 @@ const goalsData = [
   },
 ];
 
-// Goal templates organized by categories
 const goalTemplates = {
   "Exercício Físico": [
     { title: "Caminhada Diária", description: "Caminhar por pelo menos 30 minutos todos os dias." },
@@ -103,10 +149,11 @@ const ProfessionalDashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<{title: string, description: string} | null>(null);
   const [isGroupGoal, setIsGroupGoal] = useState(false);
+  const [viewingPatientDetails, setViewingPatientDetails] = useState(false);
+  const [activePatientTab, setActivePatientTab] = useState("goals");
   
   const { toast } = useToast();
   
-  // Filter patients based on search term
   const filteredPatients = patientsData.filter(patient => 
     patient.name.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
     patient.email.toLowerCase().includes(patientSearchTerm.toLowerCase())
@@ -162,10 +209,23 @@ const ProfessionalDashboard = () => {
   const handleSelectTemplate = (title: string, description: string) => {
     setSelectedTemplate({ title, description });
   };
+
+  const handleViewPatientDetails = (patientId: number) => {
+    setSelectedPatient(patientId);
+    setViewingPatientDetails(true);
+    setActivePatientTab("goals");
+  };
+
+  const handleBackToPatientsList = () => {
+    setViewingPatientDetails(false);
+    setSelectedPatient(null);
+  };
+
+  const currentPatient = selectedPatient ? patientsData.find(p => p.id === selectedPatient) : null;
+  const patientGoals = selectedPatient ? goalsData.filter(g => g.patientId === selectedPatient) : [];
   
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar */}
       <aside className="bg-secondary text-white w-20 md:w-64 flex flex-col">
         <div className="p-4 flex items-center justify-center md:justify-start">
           <div className="bg-clinic-yellow p-2 rounded-md">
@@ -229,14 +289,13 @@ const ProfessionalDashboard = () => {
         </div>
       </aside>
       
-      {/* Main Content */}
       <div className="flex-grow bg-gray-50 overflow-y-auto">
-        {/* Header */}
         <header className="bg-white shadow-sm p-4">
           <div className="flex justify-between items-center">
             <h1 className="text-xl font-bold">
               {activeTab === "dashboard" && "Dashboard do Profissional"}
-              {activeTab === "patients" && "Gerenciar Pacientes"}
+              {activeTab === "patients" && !viewingPatientDetails && "Gerenciar Pacientes"}
+              {activeTab === "patients" && viewingPatientDetails && `Detalhes do Paciente: ${currentPatient?.name}`}
               {activeTab === "settings" && "Configurações"}
             </h1>
             
@@ -252,7 +311,6 @@ const ProfessionalDashboard = () => {
           </div>
         </header>
         
-        {/* Dashboard Content */}
         {activeTab === "dashboard" && (
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -424,8 +482,7 @@ const ProfessionalDashboard = () => {
           </div>
         )}
         
-        {/* Patients Tab */}
-        {activeTab === "patients" && (
+        {activeTab === "patients" && !viewingPatientDetails && (
           <div className="p-6">
             <div className="flex justify-between mb-6">
               <div className="relative">
@@ -536,6 +593,7 @@ const ProfessionalDashboard = () => {
                         </button>
                         <button
                           className="text-sm bg-gray-100 text-gray-800 px-3 py-1 rounded-md hover:bg-gray-200"
+                          onClick={() => handleViewPatientDetails(patient.id)}
                         >
                           Ver Detalhes
                         </button>
@@ -548,7 +606,190 @@ const ProfessionalDashboard = () => {
           </div>
         )}
         
-        {/* Settings Tab */}
+        {activeTab === "patients" && viewingPatientDetails && currentPatient && (
+          <div className="p-6">
+            <button 
+              onClick={handleBackToPatientsList}
+              className="flex items-center text-secondary mb-6 hover:underline"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Voltar para lista de pacientes
+            </button>
+            
+            <div className="bg-white shadow-sm rounded-lg p-6 mb-6">
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center">
+                  <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span className="font-bold text-gray-700 text-xl">
+                      {currentPatient.name.split(" ").map(n => n[0]).join("")}
+                    </span>
+                  </div>
+                  <div className="ml-4">
+                    <h2 className="text-2xl font-bold">{currentPatient.name}</h2>
+                    <div className="text-gray-600">{currentPatient.email}</div>
+                    <div className="text-gray-600">{currentPatient.phone}</div>
+                    <div className="mt-1 text-sm">
+                      <span className="font-semibold">Última atividade:</span> {currentPatient.lastActivity}
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  className="bg-clinic-yellow text-black px-4 py-2 rounded-md hover:bg-clinic-yellow/90"
+                  onClick={() => handlePatientSelect(currentPatient.id)}
+                >
+                  <Plus className="h-4 w-4 mr-1 inline-block" />
+                  Nova Meta
+                </button>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <span className="text-gray-700">Progresso</span>
+                  <div className="text-2xl font-bold">
+                    {currentPatient.completedGoals}/{currentPatient.totalGoals} metas
+                  </div>
+                </div>
+                <div className="w-64 h-3 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-clinic-yellow"
+                    style={{ width: `${(currentPatient.completedGoals / currentPatient.totalGoals) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <div className="flex border-b">
+                <button
+                  className={`px-4 py-2 font-medium ${
+                    activePatientTab === "goals" 
+                      ? "border-b-2 border-clinic-yellow text-clinic-black" 
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActivePatientTab("goals")}
+                >
+                  <Calendar className="h-4 w-4 mr-1 inline-block" />
+                  Metas
+                </button>
+                <button
+                  className={`px-4 py-2 font-medium ${
+                    activePatientTab === "diary" 
+                      ? "border-b-2 border-clinic-yellow text-clinic-black" 
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActivePatientTab("diary")}
+                >
+                  <Book className="h-4 w-4 mr-1 inline-block" />
+                  Diário
+                </button>
+              </div>
+            </div>
+            
+            {activePatientTab === "goals" && (
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Meta
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Prioridade
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Data Limite
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {patientGoals.length > 0 ? (
+                      patientGoals.map((goal) => (
+                        <tr key={goal.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4">
+                            <div className="font-medium">{goal.title}</div>
+                            <div className="text-sm text-gray-500">{goal.description.substring(0, 60)}...</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {goal.status === "completed" && (
+                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                <Check className="h-4 w-4 mr-1" /> Concluída
+                              </span>
+                            )}
+                            {goal.status === "in-progress" && (
+                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                <Clock className="h-4 w-4 mr-1" /> Em Progresso
+                              </span>
+                            )}
+                            {goal.status === "pending" && (
+                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                <AlertTriangle className="h-4 w-4 mr-1" /> Pendente
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {goal.priority === "alta" && (
+                              <span className="px-2 py-1 text-xs rounded bg-red-100 text-red-800">
+                                Alta
+                              </span>
+                            )}
+                            {goal.priority === "média" && (
+                              <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
+                                Média
+                              </span>
+                            )}
+                            {goal.priority === "baixa" && (
+                              <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                                Baixa
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {goal.dueDate}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                          Este paciente ainda não possui metas.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            
+            {activePatientTab === "diary" && (
+              <div className="space-y-4">
+                {currentPatient.diaryEntries && currentPatient.diaryEntries.length > 0 ? (
+                  currentPatient.diaryEntries.map((entry) => (
+                    <div key={entry.id} className="bg-white rounded-lg shadow-sm p-6">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h3 className="text-lg font-medium">{entry.date}</h3>
+                          <div className="text-sm text-gray-500">
+                            Humor: <span className="font-medium">{entry.mood}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-gray-700">{entry.content}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-white rounded-lg shadow-sm p-6 text-center text-gray-500">
+                    Este paciente ainda não possui entradas no diário.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+        
         {activeTab === "settings" && (
           <div className="p-6">
             <div className="bg-white rounded-lg shadow-sm p-6 max-w-2xl">
@@ -614,7 +855,6 @@ const ProfessionalDashboard = () => {
         )}
       </div>
       
-      {/* Add Patient Modal */}
       {showAddPatientModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
@@ -691,7 +931,6 @@ const ProfessionalDashboard = () => {
         </div>
       )}
       
-      {/* Add Goal Modal */}
       {showAddGoalModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
