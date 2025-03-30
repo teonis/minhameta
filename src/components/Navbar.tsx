@@ -1,18 +1,28 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  return <nav className="bg-white shadow-md py-4 px-6 sticky top-0 z-50">
+  
+  return (
+    <nav className="bg-white shadow-md py-4 px-6 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
-          <div className="bg-clinic-yellow p-2 rounded-md">
-            <span className="font-bold text-clinic-black text-xl">MM</span>
-          </div>
-          <span className="font-bold text-xl hidden sm:block">Minha Meta</span>
+          <img 
+            src="/lovable-uploads/9074461e-2771-48a6-9b29-9664cb301ad9.png" 
+            alt="Logo Minha Meta" 
+            className="h-10 w-auto"
+          />
+          <span className="font-bold text-xl hidden sm:flex">
+            <span className="text-clinic-black">Minha</span>
+            <span className="text-clinic-yellow">Meta</span>
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -41,7 +51,8 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Navigation */}
-      {isMenuOpen && <div className="md:hidden absolute top-16 left-0 right-0 bg-white shadow-lg z-50">
+      {isMenuOpen && (
+        <div className="md:hidden absolute top-16 left-0 right-0 bg-white shadow-lg z-50">
           <div className="flex flex-col p-4 space-y-3">
             <Link to="/" className="hover:text-clinic-yellow p-2 transition-colors" onClick={toggleMenu}>
               Início
@@ -59,7 +70,10 @@ const Navbar = () => {
               Cadastrar
             </Link>
           </div>
-        </div>}
-    </nav>;
+        </div>
+      )}
+    </nav>
+  );
 };
+
 export default Navbar;
