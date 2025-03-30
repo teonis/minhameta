@@ -1,7 +1,8 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -10,25 +11,47 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Extrair a rota de retorno dos state params, se disponível
+  const returnTo = location.state?.returnTo || (
+    email.includes("profissional") ? "/profissional/dashboard" : "/paciente/dashboard"
+  );
+  
+  useEffect(() => {
+    // Verificar se o usuário já está logado
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+      navigate(returnTo);
+    }
+  }, [navigate, returnTo]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would handle authentication here
-    // For now, let's just simulate a basic validation
     
     if (!email || !password) {
       setError("Por favor, preencha todos os campos");
       return;
     }
     
-    // This would be replaced with actual authentication logic
-    console.log("Login attempt with:", { email, password });
-    
-    // For demo purposes, redirect to the appropriate dashboard based on email
-    if (email.includes("profissional")) {
-      window.location.href = "/profissional/dashboard";
-    } else {
-      window.location.href = "/paciente/dashboard";
+    // Simulação de autenticação bem-sucedida
+    // Em uma aplicação real, isso seria uma chamada à API
+    try {
+      // Armazenar o status de login no localStorage
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      // Mensagem de sucesso
+      toast.success("Login realizado com sucesso!", {
+        description: "Redirecionando...",
+        duration: 3000
+      });
+      
+      // Redirecionar para a rota de retorno ou dashboard apropriado
+      setTimeout(() => {
+        navigate(returnTo);
+      }, 1000);
+    } catch (err) {
+      setError("Falha no login. Verifique suas credenciais.");
     }
   };
   
@@ -43,6 +66,11 @@ const Login = () => {
             <p className="text-gray-600 mt-2">
               Faça login para acessar sua conta
             </p>
+            {returnTo === '/comunidade' && (
+              <p className="text-clinic-yellow mt-2 font-medium">
+                Você precisa estar logado para acessar a comunidade
+              </p>
+            )}
           </div>
           
           {error && (

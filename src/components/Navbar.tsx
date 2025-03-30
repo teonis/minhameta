@@ -1,10 +1,30 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Users } from "lucide-react";
+import AuthStatus from "./AuthStatus";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const location = useLocation();
+  
+  // Verificar se o usuário está logado quando o componente montar e quando a rota mudar
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const loginStatus = localStorage.getItem('isLoggedIn') === 'true';
+      setIsLoggedIn(loginStatus);
+    };
+    
+    checkLoginStatus();
+    
+    // Adicionar um event listener para atualizar quando o localStorage mudar
+    window.addEventListener('storage', checkLoginStatus);
+    
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus);
+    };
+  }, [location]);
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -39,12 +59,19 @@ const Navbar = () => {
           <Link to="/comunidade" className="flex items-center gap-1 hover:text-clinic-yellow transition-colors">
             <Users size={18} /> Comunidade
           </Link>
-          <Link to="/login" className="btn-primary">
-            Entrar
-          </Link>
-          <Link to="/register" className="btn-secondary">
-            Cadastrar
-          </Link>
+          
+          {isLoggedIn ? (
+            <AuthStatus />
+          ) : (
+            <>
+              <Link to="/login" className="btn-primary">
+                Entrar
+              </Link>
+              <Link to="/register" className="btn-secondary">
+                Cadastrar
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -69,12 +96,21 @@ const Navbar = () => {
             <Link to="/comunidade" className="flex items-center gap-1 hover:text-clinic-yellow p-2 transition-colors" onClick={toggleMenu}>
               <Users size={18} /> Comunidade
             </Link>
-            <Link to="/login" className="btn-primary p-2 text-center" onClick={toggleMenu}>
-              Entrar
-            </Link>
-            <Link to="/register" className="btn-secondary p-2 text-center" onClick={toggleMenu}>
-              Cadastrar
-            </Link>
+            
+            {isLoggedIn ? (
+              <div className="p-2">
+                <AuthStatus />
+              </div>
+            ) : (
+              <>
+                <Link to="/login" className="btn-primary p-2 text-center" onClick={toggleMenu}>
+                  Entrar
+                </Link>
+                <Link to="/register" className="btn-secondary p-2 text-center" onClick={toggleMenu}>
+                  Cadastrar
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

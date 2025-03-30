@@ -1,7 +1,8 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -13,6 +14,13 @@ const Register = () => {
   const [userType, setUserType] = useState("paciente");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Extrair a rota de retorno dos state params, se disponível
+  const returnTo = location.state?.returnTo || (
+    userType === "profissional" ? "/profissional/dashboard" : "/paciente/dashboard"
+  );
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,11 +37,26 @@ const Register = () => {
       return;
     }
     
-    // This would be replaced with actual registration logic
-    console.log("Registration attempt with:", { name, email, password, userType });
-    
-    // For demo purposes, redirect to login page
-    window.location.href = "/login";
+    try {
+      // Simulação de cadastro bem-sucedido
+      // Em uma aplicação real, isso seria uma chamada à API
+      
+      // Armazenar o status de login no localStorage
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      // Mensagem de sucesso
+      toast.success("Cadastro realizado com sucesso!", {
+        description: "Redirecionando...",
+        duration: 3000
+      });
+      
+      // Redirecionar para a rota de retorno ou dashboard apropriado
+      setTimeout(() => {
+        navigate(returnTo);
+      }, 1000);
+    } catch (err) {
+      setError("Falha no cadastro. Tente novamente mais tarde.");
+    }
   };
   
   return (
@@ -47,6 +70,11 @@ const Register = () => {
             <p className="text-gray-600 mt-2">
               Preencha o formulário para se registrar
             </p>
+            {location.state?.returnTo === '/comunidade' && (
+              <p className="text-clinic-yellow mt-2 font-medium">
+                Você precisa estar cadastrado para acessar a comunidade
+              </p>
+            )}
           </div>
           
           {error && (
