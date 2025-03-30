@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import ComunidadeMeta from "@/components/social/ComunidadeMeta";
 
 const patientData = {
   id: 1,
@@ -418,6 +419,8 @@ const PatientDashboard = () => {
                 </div>
               </div>
             </div>
+            
+            <ComunidadeMeta />
           </div>
         )}
         
