@@ -15,8 +15,61 @@ import ChallengeCard from './ChallengeCard';
 import GroupCard from './GroupCard';
 import AchievementCard from './AchievementCard';
 
+// Define explicit types to fix the TypeScript errors
+type Visibility = "public" | "friends" | "private";
+type Level = "bronze" | "prata" | "ouro";
+
+type Post = {
+  id: number;
+  userId: number;
+  userName: string;
+  userInitials: string;
+  userAvatar: string | null;
+  content: string;
+  image: string | null;
+  visibility: Visibility;
+  createdAt: string;
+  reactions: { thumbsUp: number; heart: number; clap: number; };
+  comments: { id: number; userId: number; userName: string; content: string; }[];
+};
+
+type Group = {
+  id: number;
+  name: string;
+  description: string;
+  coverImage: string;
+  memberCount: number;
+  professionalId: number;
+  professionalName: string;
+};
+
+type Challenge = {
+  id: number;
+  title: string;
+  description: string;
+  groupId: number;
+  groupName: string;
+  professionalId: number;
+  professionalName: string;
+  startDate: string;
+  endDate: string;
+  collectiveGoal: number;
+  currentProgress: number;
+  participants: number;
+};
+
+type Achievement = {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+  category: string;
+  level: Level;
+  unlockedAt: string;
+};
+
 // Simulated data - In a real app, this would come from Supabase
-const mockPosts = [
+const mockPosts: Post[] = [
   {
     id: 1,
     userId: 101,
@@ -48,7 +101,7 @@ const mockPosts = [
   }
 ];
 
-const mockGroups = [
+const mockGroups: Group[] = [
   {
     id: 1,
     name: "Saúde Mental",
@@ -69,7 +122,7 @@ const mockGroups = [
   }
 ];
 
-const mockChallenges = [
+const mockChallenges: Challenge[] = [
   {
     id: 1,
     title: "21 Dias de Meditação",
@@ -100,7 +153,7 @@ const mockChallenges = [
   }
 ];
 
-const mockAchievements = [
+const mockAchievements: Achievement[] = [
   {
     id: 1,
     name: "Primeira Meta Concluída",
@@ -130,9 +183,15 @@ const mockAchievements = [
   }
 ];
 
+// Export the type definitions for use in other components
+export type { Post, Group, Challenge, Achievement, Visibility, Level };
+
+// Export the mock data for use in other components
+export { mockPosts, mockGroups, mockChallenges, mockAchievements };
+
 const ComunidadeMeta = () => {
   const [newPostContent, setNewPostContent] = useState('');
-  const [postVisibility, setPostVisibility] = useState('public');
+  const [postVisibility, setPostVisibility] = useState<Visibility>('public');
 
   const handlePostSubmit = (e: React.FormEvent) => {
     e.preventDefault();
