@@ -28,15 +28,41 @@ const ForgotPassword = () => {
     resetPasswordWithCode, 
     isLoading, 
     canResend,
-    displayedCode 
+    displayedCode,
+    clearDisplayedCode
   } = useRecoveryCode();
 
-  // Se veio da página de código alternativo, mostrar o código na tela
+  // Handle coming from the alternative code page
   useEffect(() => {
-    if (location.state?.alternativeCodeGenerated && displayedCode) {
-      toast.info(`Seu código de recuperação: ${displayedCode}`, {
-        duration: 10000,
-      });
+    if (location.state?.alternativeCodeGenerated) {
+      // If we have a recovery email from the state, use it
+      if (location.state.recoveryEmail) {
+        setUserEmail(location.state.recoveryEmail);
+      }
+      
+      // If we have a displayed code, show it to the user
+      if (displayedCode) {
+        // Set expiration time (15 minutes from now)
+        const expiresAt = new Date();
+        expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+        setExpirationTime(expiresAt);
+        
+        // Show the code in a toast that stays longer
+        toast.info(
+          <div className="space-y-2">
+            <p className="font-medium">Seu código de recuperação:</p>
+            <p className="font-mono text-lg tracking-widest bg-yellow-50 p-2 rounded">{displayedCode}</p>
+            <p className="text-xs">Utilize este código no passo seguinte</p>
+          </div>,
+          {
+            duration: 15000,
+            id: "recovery-code-toast"
+          }
+        );
+        
+        // Automatically proceed to code verification step
+        setCurrentStep(PasswordRecoveryStep.VERIFY_CODE);
+      }
     }
   }, [location.state, displayedCode]);
 
@@ -85,6 +111,9 @@ const ForgotPassword = () => {
       const success = await resetPasswordWithCode(userEmail, recoveryCode, values.password);
       
       if (success) {
+        // Clear the displayed code since we've completed the flow
+        clearDisplayedCode();
+        
         toast.success("Senha redefinida com sucesso!");
         setCurrentStep(PasswordRecoveryStep.SUCCESS);
         

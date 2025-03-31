@@ -1,14 +1,21 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 
 interface SubmitButtonProps {
   isLoading: boolean;
   onClick?: () => void;
+  text?: string;
+  loadingText?: string;
 }
 
-const SubmitButton: React.FC<SubmitButtonProps> = ({ isLoading, onClick }) => {
+const SubmitButton: React.FC<SubmitButtonProps> = ({ 
+  isLoading, 
+  onClick, 
+  text = "Enviar Código",
+  loadingText = "Enviando..."
+}) => {
   return (
     <Button
       type={onClick ? "button" : "submit"}
@@ -16,8 +23,17 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({ isLoading, onClick }) => {
       disabled={isLoading}
       onClick={onClick}
     >
-      {isLoading ? "Enviando..." : "Enviar Código"}
-      {!isLoading && <ArrowRight className="h-4 w-4" />}
+      {isLoading ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {loadingText}
+        </>
+      ) : (
+        <>
+          {text}
+          <ArrowRight className="h-4 w-4" />
+        </>
+      )}
     </Button>
   );
 };

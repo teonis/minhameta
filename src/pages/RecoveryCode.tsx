@@ -15,6 +15,7 @@ import FormError from "@/components/auth/common/FormError";
 import EmailInput from "@/components/auth/password/recovery/request-code/EmailInput";
 import SubmitButton from "@/components/auth/password/recovery/request-code/SubmitButton";
 import BackToLogin from "@/components/auth/password/recovery/request-code/BackToLogin";
+import { Copy, CheckCircle, AlertTriangle } from "lucide-react";
 
 const recoveryCodeSchema = z.object({
   email: z.string()
@@ -27,6 +28,7 @@ type RecoveryCodeValues = z.infer<typeof recoveryCodeSchema>;
 const RecoveryCode = () => {
   const [error, setError] = useState("");
   const [showCodeDialog, setShowCodeDialog] = useState(false);
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
   
   const { 
@@ -59,14 +61,28 @@ const RecoveryCode = () => {
   };
 
   const handleContinue = () => {
-    clearDisplayedCode();
+    // Don't clear the displayed code anymore so it can be used in the next page
+    // clearDisplayedCode();
     setShowCodeDialog(false);
     
     navigate("/forgot-password", { 
       state: { 
-        alternativeCodeGenerated: true 
+        alternativeCodeGenerated: true,
+        recoveryEmail: form.getValues().email
       } 
     });
+  };
+
+  const copyToClipboard = () => {
+    if (displayedCode) {
+      navigator.clipboard.writeText(displayedCode);
+      setCopied(true);
+      toast.success("Código copiado para a área de transferência!");
+      
+      setTimeout(() => {
+        setCopied(false);
+      }, 3000);
+    }
   };
 
   return (
@@ -82,10 +98,13 @@ const RecoveryCode = () => {
         <CardContent className="pt-6">
           {error && <FormError error={error} />}
           
-          <p className="text-sm mb-4">
-            Informe seu email para gerar um código de recuperação alternativo 
-            que será exibido diretamente na tela.
-          </p>
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md flex items-start">
+            <AlertTriangle className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-700">
+              Informe seu email para gerar um código de recuperação alternativo 
+              que será exibido diretamente na tela.
+            </p>
+          </div>
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleGetCode)} className="space-y-4">
@@ -100,7 +119,7 @@ const RecoveryCode = () => {
       </Card>
       
       <Dialog open={showCodeDialog} onOpenChange={setShowCodeDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Seu Código de Recuperação</DialogTitle>
             <DialogDescription>
@@ -108,16 +127,34 @@ const RecoveryCode = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="my-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md text-center">
-            <h3 className="text-xl font-mono tracking-widest">{displayedCode}</h3>
-            <p className="text-xs text-gray-500 mt-2">Este código expira em 15 minutos</p>
+          <div className="my-6">
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md text-center relative">
+              <h3 className="text-xl font-mono tracking-widest">{displayedCode}</h3>
+              <p className="text-xs text-gray-500 mt-2">Este código expira em 15 minutos</p>
+              
+              <Button 
+                onClick={copyToClipboard}
+                variant="outline" 
+                size="sm"
+                className="absolute top-2 right-2"
+              >
+                {copied ? <CheckCircle className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+            
+            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+              <p className="text-sm text-amber-700">
+                <strong>Importante:</strong> Não feche esta janela até copiar ou anotar seu código. 
+                Ele não poderá ser recuperado novamente.
+              </p>
+            </div>
           </div>
           
           <Button 
             onClick={handleContinue}
             className="w-full bg-clinic-yellow text-black hover:bg-clinic-yellow/90"
           >
-            Continuar
+            Continuar para Redefinição de Senha
           </Button>
         </DialogContent>
       </Dialog>
