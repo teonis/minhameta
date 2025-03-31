@@ -4,6 +4,7 @@ import DashboardView from "./DashboardView";
 import PatientsListView from "./PatientsListView";
 import PatientDetailsView from "./PatientDetailsView";
 import SettingsView from "./SettingsView";
+import ProfessionalAnalyticsTab from "./tabs/ProfessionalAnalyticsTab";
 
 const ProfessionalDashboardContent = () => {
   const {
@@ -58,6 +59,10 @@ const ProfessionalDashboardContent = () => {
           onAddGoal={handlePatientSelect}
           onOpenAIAssistant={handleOpenAIAssistant}
         />
+      )}
+      
+      {activeTab === "analytics" && (
+        <ProfessionalAnalyticsTab />
       )}
       
       {activeTab === "settings" && <SettingsView />}

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LoaderCircle, Sparkles, Send, RefreshCw } from "lucide-react";
+import { LoaderCircle, Sparkles, Send, RefreshCw, BarChart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 type PatientGoal = {
@@ -23,11 +23,21 @@ type AIAssistantModalProps = {
   patientId?: number;
   patientName?: string;
   patientGoals?: PatientGoal[];
+  initialTab?: string;
+  initialPrompt?: string;
 };
 
-const AIAssistantModal = ({ isOpen, onClose, patientId, patientName, patientGoals }: AIAssistantModalProps) => {
-  const [activeTab, setActiveTab] = useState("goalAdjustment");
-  const [userPrompt, setUserPrompt] = useState("");
+const AIAssistantModal = ({ 
+  isOpen, 
+  onClose, 
+  patientId, 
+  patientName, 
+  patientGoals,
+  initialTab = "goalAdjustment",
+  initialPrompt = ""
+}: AIAssistantModalProps) => {
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [userPrompt, setUserPrompt] = useState(initialPrompt);
   const [isLoading, setIsLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState("");
 
@@ -85,7 +95,27 @@ Recomendo:
    Meta de nutrição básica que pode servir como porta de entrada para hábitos alimentares mais saudáveis.
 
 4. **Pausas Ativas** - 2 pausas de 5 minutos por dia
-   Complementa a meta de exercícios, integra movimento no dia-a-dia.`
+   Complementa a meta de exercícios, integra movimento no dia-a-dia.`,
+        
+        analyticsInsights: `# Análise de Dados dos Relatórios Semanais
+
+## Padrões de Conclusão de Metas
+Analisando os dados de conclusão de metas dos seus pacientes, observo os seguintes padrões:
+
+1. **Variação por Categoria**: Metas de bem-estar têm taxa de conclusão 35% superior às metas de nutrição
+2. **Variação Temporal**: A adesão cai significativamente aos finais de semana (-28% em média)
+3. **Janela de Oportunidade**: O período da manhã (6h-10h) apresenta as maiores taxas de conclusão
+
+## Correlações Notáveis
+- Pacientes com pelo menos uma meta de autocuidado têm 40% mais chances de completar outras metas
+- Metas com lembretes programados têm taxa de conclusão 25% maior
+- Metas que exigem registro de evidência têm adesão 15% menor inicialmente, mas melhor retenção ao longo do tempo
+
+## Sugestões Baseadas em Dados
+1. Priorize metas de bem-estar como "porta de entrada" para pacientes novos
+2. Implemente sistema de lembretes inteligentes baseado nos horários de maior produtividade
+3. Segmente metas de fim de semana: reduza a complexidade ou torne-as opcionais
+4. Desenvolva um programa de "micro-metas" para categorias com baixa adesão`
       };
       
       setAiResponse(simulatedResponses[activeTab as keyof typeof simulatedResponses] || "");
@@ -115,6 +145,10 @@ Recomendo:
             <TabsTrigger value="adherencePrediction" className="flex-1">Previsão de Adesão</TabsTrigger>
             <TabsTrigger value="reportGeneration" className="flex-1">Relatório</TabsTrigger>
             <TabsTrigger value="goalSuggestions" className="flex-1">Sugestões</TabsTrigger>
+            <TabsTrigger value="analyticsInsights" className="flex-1">
+              <BarChart className="h-4 w-4 mr-1" />
+              Análises
+            </TabsTrigger>
           </TabsList>
 
           {patientGoals && patientGoals.length > 0 && (
@@ -135,10 +169,12 @@ Recomendo:
               <div>
                 <div className="flex">
                   <Textarea 
-                    placeholder={`Faça uma pergunta sobre ${activeTab === 'goalAdjustment' ? 'ajustes nas metas' : 
-                                                            activeTab === 'adherencePrediction' ? 'previsão de adesão' : 
-                                                            activeTab === 'reportGeneration' ? 'geração de relatório' : 
-                                                            'sugestões de metas'} para ${patientName || 'o paciente'}`}
+                    placeholder={`Faça uma pergunta sobre ${
+                      activeTab === 'goalAdjustment' ? 'ajustes nas metas' : 
+                      activeTab === 'adherencePrediction' ? 'previsão de adesão' : 
+                      activeTab === 'reportGeneration' ? 'geração de relatório' : 
+                      activeTab === 'analyticsInsights' ? 'análise de dados e insights' :
+                      'sugestões de metas'} para ${patientName || 'o paciente'}`}
                     value={userPrompt}
                     onChange={(e) => setUserPrompt(e.target.value)}
                     className="min-h-[100px] flex-1"
