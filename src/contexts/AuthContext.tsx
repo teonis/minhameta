@@ -23,6 +23,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     MFADialog
   } = useAuthProvider();
 
+  // Use the authorization hook
+  const { hasPermission } = useAuthorization();
+
   // Create the context value
   const value: AuthContextType = {
     currentUser,
@@ -35,23 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     verifyMFA,
     resetPassword,
     updatePassword,
-    hasPermission: (requiredRole: UserRole): boolean => {
-      if (!currentUser) return false;
-      
-      // Role hierarchy check
-      switch (currentUser.role) {
-        case UserRole.SUPER_ADMIN:
-          return true; // Super admin has access to everything
-        case UserRole.ADMIN:
-          return requiredRole !== UserRole.SUPER_ADMIN;
-        case UserRole.PROFESSIONAL:
-          return requiredRole === UserRole.PROFESSIONAL || requiredRole === UserRole.PATIENT;
-        case UserRole.PATIENT:
-          return requiredRole === UserRole.PATIENT;
-        default:
-          return false;
-      }
-    }
+    hasPermission
   };
 
   return (
