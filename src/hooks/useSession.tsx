@@ -1,83 +1,33 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { User } from '@/types/auth';
+import { useCallback } from 'react';
 import { toast } from 'sonner';
+import { useSessionCore } from './session/useSessionCore';
+import { useActivityTracking } from './session/useActivityTracking';
 
 export const useSession = (onLogout: () => void) => {
-  const [sessionTimeout, setSessionTimeout] = useState<NodeJS.Timeout | null>(null);
-
-  const resetSessionTimeout = useCallback(() => {
-    if (sessionTimeout) {
-      clearTimeout(sessionTimeout);
-    }
-    
-    // Set session expiration (30 minutes)
-    const expirationTime = new Date(new Date().getTime() + 30 * 60 * 1000);
-    localStorage.setItem('sessionExpiresAt', expirationTime.toISOString());
-    
-    const timeout = setTimeout(() => {
-      onLogout();
-      toast.info("Sua sessão expirou por inatividade. Por favor, faça login novamente.");
-    }, 30 * 60 * 1000);
-    
-    setSessionTimeout(timeout);
-  }, [sessionTimeout, onLogout]);
-
-  // Restore session from localStorage
-  const restoreSession = useCallback((): User | null => {
-    const savedUser = localStorage.getItem('currentUser');
-    const expiresAt = localStorage.getItem('sessionExpiresAt');
-    
-    if (savedUser && expiresAt && new Date(expiresAt) > new Date()) {
-      resetSessionTimeout();
-      return JSON.parse(savedUser);
-    } else {
-      // Clear expired session
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('sessionExpiresAt');
-      localStorage.removeItem('isLoggedIn');
-      return null;
-    }
-  }, [resetSessionTimeout]);
-
-  // Set up activity listeners for session extension
-  useEffect(() => {
-    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart'];
-    
-    const handleUserActivity = () => {
-      const savedUser = localStorage.getItem('currentUser');
-      if (savedUser) {
-        resetSessionTimeout();
-      }
-    };
-    
-    activityEvents.forEach(event => {
-      window.addEventListener(event, handleUserActivity);
-    });
-    
-    return () => {
-      activityEvents.forEach(event => {
-        window.removeEventListener(event, handleUserActivity);
-      });
-      
-      if (sessionTimeout) {
-        clearTimeout(sessionTimeout);
-      }
-    };
-  }, [sessionTimeout, resetSessionTimeout]);
+  // Create a wrapped logout function that shows a toast
+  const handleSessionExpired = useCallback(() => {
+    onLogout();
+    toast.info("Sua sessão expirou por inatividade. Por favor, faça login novamente.");
+  }, [onLogout]);
+  
+  // Initialize core session functionality
+  const sessionCore = useSessionCore(handleSessionExpired);
+  
+  // Initialize activity tracking
+  const checkForActiveSession = useCallback(() => {
+    return localStorage.getItem('currentUser') !== null;
+  }, []);
+  
+  useActivityTracking(
+    checkForActiveSession,
+    sessionCore.resetSessionTimeout
+  );
 
   return {
-    sessionTimeout,
-    resetSessionTimeout,
-    restoreSession,
-    clearSession: () => {
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('sessionExpiresAt');
-      localStorage.removeItem('isLoggedIn');
-      
-      if (sessionTimeout) {
-        clearTimeout(sessionTimeout);
-      }
-    }
+    sessionTimeout: sessionCore.sessionTimeout,
+    resetSessionTimeout: sessionCore.resetSessionTimeout,
+    restoreSession: sessionCore.restoreSession,
+    clearSession: sessionCore.clearSession
   };
 };
