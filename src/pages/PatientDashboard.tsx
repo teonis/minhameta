@@ -1,10 +1,9 @@
-
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { 
   LogOut, 
   User, 
-  Users,  // Adding the Users icon import
+  Users,
   Settings, 
   Calendar, 
   CheckCircle, 
@@ -14,12 +13,14 @@ import {
   Plus,
   Edit,
   FileText,
-  Send
+  Send,
+  Trophy
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import ComunidadeMeta from "@/components/social/ComunidadeMeta";
 import { useIsMobile } from "@/hooks/use-mobile";
+import PatientAchievementsTab from "@/components/achievements/PatientAchievementsTab";
 
 const patientData = {
   id: 1,
@@ -192,11 +193,11 @@ const PatientDashboard = () => {
               <span className="text-xs mt-1">Diário</span>
             </button>
             <button
-              onClick={() => setActiveTab("achievements")}
-              className={`flex flex-col items-center p-2 ${activeTab === "achievements" ? "text-clinic-yellow" : "text-white/80"}`}
+              onClick={() => setActiveTab("medals")} 
+              className={`flex flex-col items-center p-2 ${activeTab === "medals" ? "text-clinic-yellow" : "text-white/80"}`}
             >
-              <Calendar className="h-5 w-5" />
-              <span className="text-xs mt-1">Conquistas</span>
+              <Trophy className="h-5 w-5" />
+              <span className="text-xs mt-1">Medalhas</span>
             </button>
           </nav>
         ) : (
@@ -239,6 +240,19 @@ const PatientDashboard = () => {
                 >
                   <FileText className="h-5 w-5 md:mr-3" />
                   <span className="hidden lg:inline">Meu Diário</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => setActiveTab("medals")}
+                  className={`w-full flex items-center px-4 py-3 ${
+                    activeTab === "medals"
+                      ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"
+                      : "hover:bg-secondary-foreground/5"
+                  }`}
+                >
+                  <Trophy className="h-5 w-5 md:mr-3" />
+                  <span className="hidden lg:inline">Minhas Medalhas</span>
                 </button>
               </li>
               <li>
@@ -291,6 +305,7 @@ const PatientDashboard = () => {
               {activeTab === "dashboard" && "Dashboard do Paciente"}
               {activeTab === "goals" && "Minhas Metas"}
               {activeTab === "diary" && "Meu Diário"}
+              {activeTab === "medals" && "Minhas Medalhas"}
               {activeTab === "achievements" && "Minhas Conquistas"}
               {activeTab === "settings" && "Configurações"}
             </h1>
@@ -660,6 +675,12 @@ const PatientDashboard = () => {
           </div>
         )}
         
+        {activeTab === "medals" && (
+          <div className="p-3 md:p-6">
+            <PatientAchievementsTab />
+          </div>
+        )}
+        
         {activeTab === "achievements" && (
           <div className="p-3 md:p-6">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -814,15 +835,15 @@ const PatientDashboard = () => {
               <span className="text-xs mt-1">Início</span>
             </Link>
             
+            <button onClick={() => setActiveTab("medals")} className="flex flex-col items-center justify-center text-gray-700 hover:text-clinic-yellow">
+              <Trophy className="h-5 w-5" />
+              <span className="text-xs mt-1">Medalhas</span>
+            </button>
+            
             <Link to="/comunidade" className="flex flex-col items-center justify-center text-gray-700 hover:text-clinic-yellow">
               <Users className="h-5 w-5" />
               <span className="text-xs mt-1">Comunidade</span>
             </Link>
-            
-            <button onClick={() => setActiveTab("diary")} className="flex flex-col items-center justify-center text-gray-700 hover:text-clinic-yellow">
-              <FileText className="h-5 w-5" />
-              <span className="text-xs mt-1">Diário</span>
-            </button>
             
             <button onClick={() => setActiveTab("settings")} className="flex flex-col items-center justify-center text-gray-700 hover:text-clinic-yellow">
               <Settings className="h-5 w-5" />
