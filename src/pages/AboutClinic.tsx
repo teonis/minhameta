@@ -63,10 +63,8 @@ Nosso compromisso é um só: levar você ao seu próximo nível.</p>
               <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">O poder da Clínica Rocha está na força da nossa equipe. Unimos os melhores profissionais em saúde para cuidar de você em cada etapa do caminho rumo aos seus objetivos.
 
 Aqui você encontra:</p>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Médicos especialistas em cardiologia, nutrologia, ginecologia e ortopedia, dedicados à excelência em resultados clínicos.
-
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Médicos especialistas em Endocrinologia, Ginecologia, Cardiologia, Nutrologia, Ortopedia e Muito mais, dedicados à excelência em resultados clínicos.
 Nutricionistas e profissionais do exercício físico preparados para transformar sua alimentação e seu corpo com planos altamente personalizados.
-
 Fisioterapeutas e odontologistas comprometidos com tratamentos que melhoram sua saúde, autoestima e qualidade de vida.</p>
               <p className="text-sm sm:text-base text-gray-700">Cada profissional da Clínica Rocha passa por um rigoroso treinamento em atendimento humanizado e técnicas de alta performance. Não basta ser especialista: é preciso ter paixão por cuidar de você.
 
@@ -80,12 +78,9 @@ Sua meta é nosso propósito. Sua vitória é nossa maior recompensa.
               <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Localizada em um ambiente tranquilo e acessível, nossa clínica foi projetada para proporcionar conforto e privacidade aos nossos pacientes.
 Atualmente, contamos com duas unidades completas e de fácil acesso:
             </p>
-              <p className="text-sm sm:text-base text-gray-700">
-João Pessoa – Ecomedical SUL
-Uma estrutura ampla com 120 m², localizada estrategicamente para proporcionar máxima conveniência. Aqui, você encontra consultórios modernos, equipamentos avançados, e ambientes dedicados à cardiologia, fisioterapia, ginecologia, ortopedia, odontologia e muito mais.
+              <p className="text-sm sm:text-base text-gray-700">📍João Pessoa – Ecomedical SUL Uma estrutura ampla com 120 m², localizada estrategicamente para proporcionar máxima conveniência. Aqui, você encontra consultórios modernos, equipamentos avançados, e ambientes dedicados à cardiologia, fisioterapia, ginecologia, ortopedia, odontologia e muito mais.
 
-Guarabira – Shopping Cidade Luz
-Nossa clínica de 90 m² dentro do Shopping Cidade Luz garante acesso facilitado e praticidade no seu dia a dia. Com espaços planejados para um atendimento acolhedor e eficiente, oferecemos serviços completos com o padrão de qualidade Rocha que você já conhece.</p>
+📍Guarabira – Shopping Cidade Luz Nossa clínica de 90 m² dentro do Shopping Cidade Luz garante acesso facilitado e praticidade no seu dia a dia. Com espaços planejados para um atendimento acolhedor e eficiente, oferecemos serviços completos com o padrão de qualidade Rocha que você já conhece.</p>
             </div>
             
             <div className="card-highlight pl-4 sm:pl-6">
@@ -95,8 +90,8 @@ Nossa clínica de 90 m² dentro do Shopping Cidade Luz garante acesso facilitado
                 <li>✅ Tratamentos Personalizados: Planos de saúde e performance desenhados exclusivamente para as suas necessidades e objetivos.</li>
                 <li>✅ Alta Tecnologia: Equipamentos de última geração, como a avaliação corporal por bioimpedância (Inbody 270) para máxima precisão e resultado.</li>
                 <li>✅ Comunidade Rocha: Um ambiente inspirador, cheio de histórias reais e motivação constante.</li>
-                <li>• Acompanhamento pós-tratamento para garantir a manutenção dos resultados</li>
-                <li>• Plataforma digital "Minha Meta" para engajamento contínuo dos pacientes</li>
+                <li>✅ Acompanhamento pós-tratamento para garantir a manutenção dos resultados</li>
+                <li>✅ Plataforma digital "Minha Meta" para engajamento contínuo dos pacientes</li>
               </ul>
             </div>
           </div>
