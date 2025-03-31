@@ -1,21 +1,25 @@
+
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
 const AboutClinic = () => {
   const isMobile = useIsMobile();
-  return <div className="min-h-screen bg-white">
+  
+  return (
+    <div className="min-h-screen bg-white">
       <Navbar />
       
-      {/* Hero Section */}
-      <div className="hero-gradient py-12 sm:py-24">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">Clínica Rocha</h1>
-            <p className="text-base sm:text-xl mb-6 sm:mb-8">
+      {/* Hero Section - Simplified */}
+      <div className="hero-gradient py-10 sm:py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-2xl sm:text-4xl font-bold mb-3 sm:mb-4">Clínica Rocha</h1>
+            <p className="text-sm sm:text-base mb-4 sm:mb-6">
               Uma abordagem integrada e personalizada para o seu bem-estar físico e mental.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login" className="btn-primary w-full sm:w-auto text-center">
                 Acessar Plataforma
               </Link>
@@ -27,83 +31,65 @@ const AboutClinic = () => {
         </div>
       </div>
 
-      {/* About Section */}
-      <div className="py-12 sm:py-24 bg-white">
-        <div className="container mx-auto px-4 sm:px-6">
+      {/* About Section - Optimized */}
+      <div className="py-10 sm:py-16 bg-white">
+        <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">Sobre a Clínica</h2>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">Sobre a Clínica</h2>
             
-            <div className="mb-8 sm:mb-12 card-highlight pl-4 sm:pl-6">
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Nossa História</h3>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">A Clínica Rocha nasceu com uma visão poderosa: transformar vidas através da saúde integrada e resultados reais. Fundada pela união de especialistas apaixonados pela medicina, nutrição e desempenho físico, desde o início tivemos um propósito claro: levar cada paciente ao seu próximo nível.
-
-Nossa jornada começou com o Time Rocha, um grupo focado em promover saúde e performance de maneira personalizada. A demanda cresceu, os resultados falaram por si mesmos, e hoje contamos com unidades completas em João Pessoa e Guarabira, oferecendo serviços que abrangem cardiologia, ortopedia, ginecologia, nutrologia, fisioterapia e odontologia.</p>
-              <p className="text-sm sm:text-base text-gray-700">Mais que uma clínica, somos uma comunidade. Aqui, cada história de sucesso inspira outras centenas, fortalecendo nossa essência e impulsionando nosso crescimento contínuo. Venha fazer parte dessa história. Venha conquistar o seu próximo nível com a Clínica Rocha.</p>
+            <div className="mb-6 card-highlight pl-4">
+              <h3 className="text-lg font-bold mb-2">Nossa História</h3>
+              <p className="text-sm text-gray-700 mb-2">
+                A Clínica Rocha nasceu com uma visão poderosa: transformar vidas através da saúde integrada e resultados reais. 
+                Fundada pela união de especialistas apaixonados pela medicina, nutrição e desempenho físico, nosso propósito é 
+                levar cada paciente ao seu próximo nível.
+              </p>
+              <p className="text-sm text-gray-700">
+                Hoje contamos com unidades completas em João Pessoa e Guarabira, oferecendo serviços que abrangem 
+                cardiologia, ortopedia, ginecologia, nutrologia, fisioterapia e odontologia.
+              </p>
             </div>
             
-            <div className="mb-8 sm:mb-12 card-highlight pl-4 sm:pl-6">
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Nossa Missão</h3>
-              <p className="text-sm sm:text-base text-gray-700">Nossa missão vai além do tratamento clínico tradicional: queremos elevar você ao seu melhor desempenho, com saúde plena e qualidade de vida real. Cada atendimento é uma oportunidade única de gerar transformação duradoura e significativa.
-
-Na Clínica Rocha, trabalhamos para:
-
-Personalizar cada estratégia de saúde e performance.
-
-Inspirar hábitos e mentalidades vencedoras.
-
-Construir uma comunidade que respira motivação e conquistas.
-
-Oferecer excelência técnica e acolhimento humano em cada consulta.
-
-Nosso compromisso é um só: levar você ao seu próximo nível.</p>
+            <div className="mb-6 card-highlight pl-4">
+              <h3 className="text-lg font-bold mb-2">Nossa Missão</h3>
+              <p className="text-sm text-gray-700">
+                Nossa missão vai além do tratamento clínico tradicional: queremos elevar você ao seu melhor desempenho, 
+                com saúde plena e qualidade de vida real. Cada atendimento é uma oportunidade única de gerar transformação 
+                duradoura e significativa.
+              </p>
             </div>
             
-            <div className="mb-8 sm:mb-12 card-highlight pl-4 sm:pl-6">
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Nossa Equipe</h3>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">O poder da Clínica Rocha está na força da nossa equipe. Unimos os melhores profissionais em saúde para cuidar de você em cada etapa do caminho rumo aos seus objetivos.
-
-Aqui você encontra:</p>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Médicos especialistas em Endocrinologia, Ginecologia, Cardiologia, Nutrologia, Ortopedia e Muito mais, dedicados à excelência em resultados clínicos.
-Nutricionistas e profissionais do exercício físico preparados para transformar sua alimentação e seu corpo com planos altamente personalizados.
-Fisioterapeutas e odontologistas comprometidos com tratamentos que melhoram sua saúde, autoestima e qualidade de vida.</p>
-              <p className="text-sm sm:text-base text-gray-700">Cada profissional da Clínica Rocha passa por um rigoroso treinamento em atendimento humanizado e técnicas de alta performance. Não basta ser especialista: é preciso ter paixão por cuidar de você.
-
-Sua meta é nosso propósito. Sua vitória é nossa maior recompensa.
-
-            </p>
+            <div className="mb-6 card-highlight pl-4">
+              <h3 className="text-lg font-bold mb-2">Nossas Instalações</h3>
+              <p className="text-sm text-gray-700">
+                📍João Pessoa – Ecomedical SUL: Uma estrutura ampla com 120 m², localizada estrategicamente para conveniência.
+              </p>
+              <p className="text-sm text-gray-700">
+                📍Guarabira – Shopping Cidade Luz: Nossa clínica de 90 m² dentro do Shopping Cidade Luz garante acesso facilitado.
+              </p>
             </div>
             
-            <div className="mb-8 sm:mb-12 card-highlight pl-4 sm:pl-6">
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Nossas Instalações</h3>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Localizada em um ambiente tranquilo e acessível, nossa clínica foi projetada para proporcionar conforto e privacidade aos nossos pacientes.
-Atualmente, contamos com duas unidades completas e de fácil acesso:
-            </p>
-              <p className="text-sm sm:text-base text-gray-700">📍João Pessoa – Ecomedical SUL Uma estrutura ampla com 120 m², localizada estrategicamente para proporcionar máxima conveniência. Aqui, você encontra consultórios modernos, equipamentos avançados, e ambientes dedicados à cardiologia, fisioterapia, ginecologia, ortopedia, odontologia e muito mais.
-
-📍Guarabira – Shopping Cidade Luz Nossa clínica de 90 m² dentro do Shopping Cidade Luz garante acesso facilitado e praticidade no seu dia a dia. Com espaços planejados para um atendimento acolhedor e eficiente, oferecemos serviços completos com o padrão de qualidade Rocha que você já conhece.</p>
-            </div>
-            
-            <div className="card-highlight pl-4 sm:pl-6">
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Diferenciais</h3>
-              <ul className="text-sm sm:text-base text-gray-700 space-y-2">
-                <li>✅ Atendimento Humanizado: Valorizamos o acolhimento e a conexão emocional com cada paciente.</li>
-                <li>✅ Tratamentos Personalizados: Planos de saúde e performance desenhados exclusivamente para as suas necessidades e objetivos.</li>
-                <li>✅ Alta Tecnologia: Equipamentos de última geração, como a avaliação corporal por bioimpedância (Inbody 270) para máxima precisão e resultado.</li>
-                <li>✅ Comunidade Rocha: Um ambiente inspirador, cheio de histórias reais e motivação constante.</li>
-                <li>✅ Acompanhamento pós-tratamento para garantir a manutenção dos resultados</li>
-                <li>✅ Plataforma digital "Minha Meta" para engajamento contínuo dos pacientes</li>
+            <div className="card-highlight pl-4">
+              <h3 className="text-lg font-bold mb-2">Diferenciais</h3>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>✅ Atendimento Humanizado</li>
+                <li>✅ Tratamentos Personalizados</li>
+                <li>✅ Alta Tecnologia</li>
+                <li>✅ Comunidade Rocha</li>
+                <li>✅ Acompanhamento pós-tratamento</li>
+                <li>✅ Plataforma digital "Minha Meta"</li>
               </ul>
             </div>
           </div>
         </div>
       </div>
       
-      {/* CTA Section */}
-      <div className="py-12 sm:py-16 bg-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Conheça nossa plataforma Minha Meta</h2>
-          <p className="text-base sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
-            Nossa plataforma exclusiva para acompanhamento terapêutico, desenvolvida para potencializar seus resultados.
+      {/* CTA Section - Simplified */}
+      <div className="py-8 sm:py-12 bg-gray-100">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-lg sm:text-xl font-bold mb-3">Conheça nossa plataforma Minha Meta</h2>
+          <p className="text-sm sm:text-base mb-4 max-w-2xl mx-auto">
+            Nossa plataforma exclusiva para acompanhamento terapêutico.
           </p>
           <Link to="/sobre-app" className="btn-primary">
             Saiba Mais
@@ -144,6 +130,8 @@ Atualmente, contamos com duas unidades completas e de fácil acesso:
       {isMobile && <div className="h-16"></div>}
       
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default AboutClinic;
