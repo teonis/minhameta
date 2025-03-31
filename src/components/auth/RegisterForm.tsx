@@ -1,10 +1,14 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/auth";
-import { Progress } from "@/components/ui/progress";
+import PasswordInput from "./password/PasswordInput";
+import PasswordStrengthIndicator from "./password/PasswordStrengthIndicator";
+import FormError from "./common/FormError";
+import UserTypeSelector from "./common/UserTypeSelector";
+import FormInput from "./common/FormInput";
 
 interface RegisterFormProps {
   returnTo: string;
@@ -16,7 +20,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userType, setUserType] = useState("patient");
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
   const navigate = useNavigate();
@@ -38,16 +41,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
     return Math.min(100, (score / 6) * 100);
   };
   
-  const getStrengthColor = (strength: number) => {
-    if (strength < 30) return "bg-red-500";
-    if (strength < 70) return "bg-yellow-500";
-    return "bg-green-500";
-  };
-  
-  const getStrengthText = (strength: number) => {
-    if (strength < 30) return "Fraca";
-    if (strength < 70) return "Média";
-    return "Forte";
+  const handlePasswordChange = (newPassword: string) => {
+    setPassword(newPassword);
+    setPasswordStrength(calculatePasswordStrength(newPassword));
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,109 +86,46 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      {error && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 sm:p-4 mb-4 sm:mb-6 text-sm sm:text-base" role="alert">
-          <p>{error}</p>
-        </div>
-      )}
+      <FormError error={error} />
       
-      <div className="mb-4 sm:mb-6">
-        <label htmlFor="name" className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base">
-          Nome Completo
-        </label>
-        <input
-          type="text"
-          id="name"
-          className="w-full px-3 sm:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow text-sm sm:text-base"
-          placeholder="Seu nome completo"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </div>
+      <FormInput
+        id="name"
+        label="Nome Completo"
+        type="text"
+        placeholder="Seu nome completo"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
       
-      <div className="mb-4 sm:mb-6">
-        <label htmlFor="email" className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base">
-          Email
-        </label>
-        <input
-          type="email"
-          id="email"
-          className="w-full px-3 sm:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow text-sm sm:text-base"
-          placeholder="seu@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
+      <FormInput
+        id="email"
+        label="Email"
+        type="email"
+        placeholder="seu@email.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
       
-      <div className="mb-4 sm:mb-6">
-        <label htmlFor="userType" className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base">
-          Tipo de Usuário
-        </label>
-        <div className="flex">
-          <label className="flex items-center mr-4 sm:mr-6 text-sm sm:text-base">
-            <input
-              type="radio"
-              name="userType"
-              value="patient"
-              checked={userType === "patient"}
-              onChange={() => setUserType("patient")}
-              className="mr-2"
-            />
-            Paciente
-          </label>
-          <label className="flex items-center text-sm sm:text-base">
-            <input
-              type="radio"
-              name="userType"
-              value="professional"
-              checked={userType === "professional"}
-              onChange={() => setUserType("professional")}
-              className="mr-2"
-            />
-            Profissional
-          </label>
-        </div>
-      </div>
+      <UserTypeSelector 
+        userType={userType}
+        onChange={setUserType}
+      />
       
       <div className="mb-4 sm:mb-6">
         <label htmlFor="password" className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base">
           Senha
         </label>
-        <div className="relative">
-          <input
-            type={showPassword ? "text" : "password"}
-            id="password"
-            className="w-full px-3 sm:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow text-sm sm:text-base"
-            placeholder="••••••"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordStrength(calculatePasswordStrength(e.target.value));
-            }}
-            required
-          />
-          <button
-            type="button"
-            className="absolute inset-y-0 right-0 pr-3 flex items-center"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
-            ) : (
-              <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
-            )}
-          </button>
-        </div>
+        <PasswordInput
+          id="password"
+          value={password}
+          onChange={handlePasswordChange}
+          placeholder="••••••"
+        />
         
         {password.length > 0 && (
-          <div className="mt-2">
-            <Progress value={passwordStrength} className="h-2" />
-            <p className="text-xs text-gray-500 mt-1">
-              Força: {getStrengthText(passwordStrength)}
-            </p>
-          </div>
+          <PasswordStrengthIndicator strength={passwordStrength} />
         )}
         
         <p className="text-xs text-gray-500 mt-1">
@@ -204,14 +137,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
         <label htmlFor="confirmPassword" className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base">
           Confirmar Senha
         </label>
-        <input
-          type={showPassword ? "text" : "password"}
+        <PasswordInput
           id="confirmPassword"
-          className="w-full px-3 sm:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow text-sm sm:text-base"
-          placeholder="••••••"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
+          onChange={(value) => setConfirmPassword(value)}
+          placeholder="••••••"
         />
       </div>
       
