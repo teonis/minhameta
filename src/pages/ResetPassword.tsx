@@ -15,14 +15,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "react-router-dom";
+import { Progress } from "@/components/ui/progress";
 
+// Novo esquema de validação com requisitos mínimos
 const passwordSchema = z.object({
   password: z.string()
-    .min(10, { message: "A senha deve ter no mínimo 10 caracteres" })
-    .regex(/[A-Z]/, { message: "Deve conter pelo menos uma letra maiúscula" })
-    .regex(/[a-z]/, { message: "Deve conter pelo menos uma letra minúscula" })
-    .regex(/[0-9]/, { message: "Deve conter pelo menos um número" })
-    .regex(/[@$!%*?&]/, { message: "Deve conter pelo menos um caractere especial (@$!%*?&)" }),
+    .min(6, { message: "A senha deve ter no mínimo 6 caracteres" }),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "As senhas não coincidem",
@@ -71,17 +69,38 @@ const ResetPassword = () => {
     }
   }, [searchParams]);
 
-  // Password strength calculator
+  // Função atualizada para calcular a força da senha
   const calculatePasswordStrength = (password: string) => {
+    if (password.length === 0) return 0;
+    
     let score = 0;
     
-    if (password.length >= 10) score += 1;
+    // Pontuação base para comprimento
+    if (password.length >= 6) score += 1;
+    if (password.length >= 8) score += 1;
+    
+    // Pontuação para complexidade
     if (/[A-Z]/.test(password)) score += 1;
     if (/[a-z]/.test(password)) score += 1;
     if (/[0-9]/.test(password)) score += 1;
-    if (/[@$!%*?&]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
     
-    setPasswordStrength(score);
+    // Normaliza score para percentual (0-100)
+    return Math.min(100, (score / 6) * 100);
+  };
+  
+  // Função para obter a cor da barra de força
+  const getStrengthColor = (strength: number) => {
+    if (strength < 30) return "bg-red-500";
+    if (strength < 70) return "bg-yellow-500";
+    return "bg-green-500";
+  };
+  
+  // Função para obter o texto do nível de força
+  const getStrengthText = (strength: number) => {
+    if (strength < 30) return "Fraca";
+    if (strength < 70) return "Média";
+    return "Forte";
   };
 
   const onSubmit = async (data: PasswordFormValues) => {
@@ -173,7 +192,7 @@ const ResetPassword = () => {
                               {...field}
                               onChange={(e) => {
                                 field.onChange(e);
-                                calculatePasswordStrength(e.target.value);
+                                setPasswordStrength(calculatePasswordStrength(e.target.value));
                               }}
                               aria-describedby="password-requirements"
                             />
@@ -193,36 +212,22 @@ const ResetPassword = () => {
                           </button>
                         </div>
                         
-                        {/* Password strength meter */}
-                        <div className="mt-2">
-                          <div className="flex h-1 overflow-hidden bg-gray-200 rounded">
-                            <div
-                              className={`${
-                                passwordStrength === 0
-                                  ? "bg-gray-200"
-                                  : passwordStrength <= 2
-                                  ? "bg-red-500"
-                                  : passwordStrength <= 3
-                                  ? "bg-yellow-500"
-                                  : "bg-green-500"
-                              } transition-all duration-300`}
-                              style={{ width: `${(passwordStrength / 5) * 100}%` }}
-                            ></div>
+                        {/* Barra de força da senha atualizada */}
+                        {field.value.length > 0 && (
+                          <div className="mt-2">
+                            <Progress
+                              value={passwordStrength}
+                              className="h-2"
+                            />
+                            <p className="text-xs mt-1" style={{ color: getStrengthColor(passwordStrength).replace('bg-', 'text-') }}>
+                              {getStrengthText(passwordStrength)}
+                            </p>
                           </div>
-                          <p className="text-xs mt-1 text-gray-500">
-                            {passwordStrength === 0
-                              ? "Senha muito fraca"
-                              : passwordStrength <= 2
-                              ? "Senha fraca"
-                              : passwordStrength <= 3
-                              ? "Senha média"
-                              : "Senha forte"}
-                          </p>
-                        </div>
+                        )}
                         
                         <FormDescription id="password-requirements" className="text-xs text-gray-500 mt-2">
-                          Sua senha deve ter no mínimo 10 caracteres e incluir letras maiúsculas,
-                          minúsculas, números e caracteres especiais (@$!%*?&).
+                          Sua senha deve ter no mínimo 6 caracteres. Para maior segurança, inclua letras maiúsculas,
+                          minúsculas, números e caracteres especiais.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

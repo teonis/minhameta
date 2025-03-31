@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/auth";
+import { Progress } from "@/components/ui/progress";
 
 interface RegisterFormProps {
   returnTo: string;
@@ -18,8 +19,43 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
   const [userType, setUserType] = useState("patient");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const navigate = useNavigate();
   const { register } = useAuth();
+  
+  // Função para calcular a força da senha
+  const calculatePasswordStrength = (password: string) => {
+    if (password.length === 0) return 0;
+    
+    let score = 0;
+    
+    // Pontuação base para comprimento
+    if (password.length >= 6) score += 1;
+    if (password.length >= 8) score += 1;
+    
+    // Pontuação para complexidade
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[a-z]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    
+    // Normaliza score para percentual (0-100)
+    return Math.min(100, (score / 6) * 100);
+  };
+  
+  // Função para obter a cor da barra de força
+  const getStrengthColor = (strength: number) => {
+    if (strength < 30) return "bg-red-500";
+    if (strength < 70) return "bg-yellow-500";
+    return "bg-green-500";
+  };
+  
+  // Função para obter o texto do nível de força
+  const getStrengthText = (strength: number) => {
+    if (strength < 30) return "Fraca";
+    if (strength < 70) return "Média";
+    return "Forte";
+  };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,10 +73,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
       return;
     }
     
-    // Validate password strength
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
-    if (!passwordPattern.test(password)) {
-      setError("Senha deve ter no mínimo 10 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
+    // Validate password length
+    if (password.length < 6) {
+      setError("Senha deve ter no mínimo 6 caracteres");
       return;
     }
     
@@ -143,9 +178,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
             type={showPassword ? "text" : "password"}
             id="password"
             className="w-full px-3 sm:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow text-sm sm:text-base"
-            placeholder="••••••••"
+            placeholder="••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setPasswordStrength(calculatePasswordStrength(e.target.value));
+            }}
             required
           />
           <button
@@ -160,8 +198,19 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
             )}
           </button>
         </div>
+        
+        {/* Barra de força da senha */}
+        {password.length > 0 && (
+          <div className="mt-2">
+            <Progress value={passwordStrength} className="h-2" indicatorClassName={getStrengthColor(passwordStrength)} />
+            <p className="text-xs text-gray-500 mt-1">
+              Força: {getStrengthText(passwordStrength)}
+            </p>
+          </div>
+        )}
+        
         <p className="text-xs text-gray-500 mt-1">
-          A senha deve ter pelo menos 10 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.
+          A senha deve ter pelo menos 6 caracteres.
         </p>
       </div>
       
@@ -173,7 +222,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
           type={showPassword ? "text" : "password"}
           id="confirmPassword"
           className="w-full px-3 sm:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-clinic-yellow text-sm sm:text-base"
-          placeholder="••••••••"
+          placeholder="••••••"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required

@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { User, UserRole, AuthContextType, MockUser } from '@/types/auth';
@@ -136,10 +137,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error("Email já cadastrado.");
       }
       
-      // Validate password strength
-      const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
-      if (!passwordPattern.test(password)) {
-        throw new Error("Senha deve ter no mínimo 10 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
+      // Validate password length - new requirement
+      if (password.length < 6) {
+        throw new Error("Senha deve ter no mínimo 6 caracteres.");
       }
       
       // In a real application, this would add to a database and send verification email
@@ -238,7 +238,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updatePassword = async (currentPassword: string, newPassword: string) => {
+    // Validate new password
+    if (newPassword.length < 6) {
+      toast.error("A nova senha deve ter no mínimo 6 caracteres.");
+      return Promise.reject(new Error("Senha muito curta."));
+    }
+    
+    // In a real app, we'd validate the current password and update in DB
     toast.success("Senha atualizada com sucesso!");
+    return Promise.resolve();
   };
 
   const logoutAllSessions = async () => {
