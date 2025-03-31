@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import PasswordStrengthIndicator from "./PasswordStrengthIndicator";
+import { calculatePasswordStrength } from "@/utils/passwordUtils";
 
 interface PasswordFieldProps {
   value: string;
@@ -17,22 +18,6 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  
-  const calculatePasswordStrength = (password: string) => {
-    if (password.length === 0) return 0;
-    
-    let score = 0;
-    
-    if (password.length >= 6) score += 1;
-    if (password.length >= 8) score += 1;
-    
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/[a-z]/.test(password)) score += 1;
-    if (/[0-9]/.test(password)) score += 1;
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;
-    
-    return Math.min(100, (score / 6) * 100);
-  };
   
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPassword = e.target.value;

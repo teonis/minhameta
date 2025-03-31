@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,6 +17,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { calculatePasswordStrength, getStrengthColor, getStrengthText } from '@/utils/passwordUtils';
 
 // Define schema for password validation
 const passwordSchema = z.object({
@@ -54,42 +54,12 @@ const PasswordSection = () => {
     }
   });
 
-  // Função para calcular a força da senha
-  const calculatePasswordStrength = (password: string) => {
-    if (password.length === 0) return 0;
-    
-    let score = 0;
-    
-    // Base score for length
-    if (password.length >= 6) score += 1;
-    if (password.length >= 8) score += 1;
-    if (password.length >= 10) score += 1;
-    
-    // Score for complexity
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/[a-z]/.test(password)) score += 1;
-    if (/[0-9]/.test(password)) score += 1;
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;
-    
-    // Check for common patterns
-    if (!/123|abc|qwerty|password|senha/i.test(password)) score += 1;
-    
-    // Normalize score to percentage (0-100)
-    return Math.min(100, Math.round((score / 8) * 100));
-  };
-  
-  // Função para obter o texto do nível de força
-  const getStrengthText = (strength: number) => {
-    if (strength < 30) return "Fraca";
-    if (strength < 70) return "Média";
-    return "Forte";
-  };
-
   const onSubmit = async (data: PasswordFormValues) => {
     try {
       await updatePassword(data.currentPassword, data.newPassword);
       form.reset();
       setPasswordStrength(0);
+      toast.success("Senha atualizada com sucesso");
     } catch (error: any) {
       toast.error(error.message || "Erro ao atualizar senha");
     }
@@ -177,7 +147,11 @@ const PasswordSection = () => {
                   {/* Barra de força da senha */}
                   {field.value.length > 0 && (
                     <div className="mt-2">
-                      <Progress value={passwordStrength} className="h-2" />
+                      <Progress 
+                        value={passwordStrength} 
+                        className="h-2" 
+                        indicatorClassName={getStrengthColor(passwordStrength)}
+                      />
                       <div className="flex justify-between mt-1">
                         <p className="text-xs text-gray-500">
                           Força: <span className={

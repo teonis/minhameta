@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "@/components/auth/AuthLayout";
@@ -19,8 +18,8 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Progress } from "@/components/ui/progress";
+import { calculatePasswordStrength, getStrengthColor, getStrengthText } from "@/utils/passwordUtils";
 
-// Define schema for validation
 const forgotPasswordSchema = z.object({
   email: z.string()
     .email({ message: "Por favor, digite um email válido" })
@@ -29,14 +28,12 @@ const forgotPasswordSchema = z.object({
 
 type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 
-// Define schema for code verification
 const verifyCodeSchema = z.object({
   code: z.string().length(6, { message: "O código deve ter 6 dígitos" })
 });
 
 type VerifyCodeValues = z.infer<typeof verifyCodeSchema>;
 
-// Define schema for password reset
 const resetPasswordSchema = z.object({
   password: z.string()
     .min(6, { message: "A senha deve ter no mínimo 6 caracteres" })
@@ -54,7 +51,6 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
 
-// Enum para controlar as etapas do processo
 enum PasswordRecoveryStep {
   REQUEST_CODE = 1,
   VERIFY_CODE = 2,
@@ -78,24 +74,21 @@ const ForgotPassword = () => {
     isLoading, 
     canResend 
   } = useRecoveryCode();
-  
-  // Formulário para solicitar código
+
   const requestCodeForm = useForm<ForgotPasswordValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
     },
   });
-  
-  // Formulário para verificar código
+
   const verifyCodeForm = useForm<VerifyCodeValues>({
     resolver: zodResolver(verifyCodeSchema),
     defaultValues: {
       code: "",
     },
   });
-  
-  // Formulário para redefinir senha
+
   const resetPasswordForm = useForm<ResetPasswordValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
@@ -104,45 +97,6 @@ const ForgotPassword = () => {
     },
   });
 
-  // Calcular força da senha
-  const calculatePasswordStrength = (password: string) => {
-    if (password.length === 0) return 0;
-    
-    let score = 0;
-    
-    // Base score for length
-    if (password.length >= 6) score += 1;
-    if (password.length >= 8) score += 1;
-    if (password.length >= 10) score += 1;
-    
-    // Score for complexity
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/[a-z]/.test(password)) score += 1;
-    if (/[0-9]/.test(password)) score += 1;
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;
-    
-    // Check for common patterns
-    if (!/123|abc|qwerty|password|senha/i.test(password)) score += 1;
-    
-    // Normalize score to percentage (0-100)
-    return Math.min(100, Math.round((score / 8) * 100));
-  };
-  
-  // Obter cor com base na força da senha
-  const getStrengthColor = (strength: number) => {
-    if (strength < 30) return "bg-red-500";
-    if (strength < 70) return "bg-yellow-500";
-    return "bg-green-500";
-  };
-  
-  // Obter texto com base na força da senha
-  const getStrengthText = (strength: number) => {
-    if (strength < 30) return "Fraca";
-    if (strength < 70) return "Média";
-    return "Forte";
-  };
-  
-  // Atualizar barra de progresso da expiração
   const updateExpirationProgress = () => {
     if (!expirationTime) return;
     
@@ -156,16 +110,13 @@ const ForgotPassword = () => {
     setExpirationProgress(progress);
     
     if (progress <= 0) {
-      // Código expirado
       setError("O código expirou. Por favor, solicite um novo código.");
       return;
     }
     
-    // Atualizar a cada segundo
     setTimeout(updateExpirationProgress, 1000);
   };
-  
-  // Formatar tempo restante
+
   const formatTimeRemaining = (): string => {
     if (!expirationTime) return "";
     
@@ -180,8 +131,7 @@ const ForgotPassword = () => {
     
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
-  
-  // Solicitar código de recuperação
+
   const handleRequestCode = async (values: ForgotPasswordValues) => {
     setError("");
     
@@ -189,15 +139,12 @@ const ForgotPassword = () => {
       const email = values.email;
       setUserEmail(email);
       
-      // Enviar código para o email
       await sendRecoveryCode(email);
       
-      // Definir expiração (15 minutos a partir de agora)
       const expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + 15);
       setExpirationTime(expiresAt);
       
-      // Iniciar atualização da barra de progresso
       setTimeout(updateExpirationProgress, 0);
       
       toast.success("Código de recuperação enviado com sucesso!");
@@ -206,8 +153,7 @@ const ForgotPassword = () => {
       setError(err.message || "Ocorreu um erro ao enviar o código. Tente novamente mais tarde.");
     }
   };
-  
-  // Verificar código informado
+
   const handleVerifyCode = async (values: VerifyCodeValues) => {
     setError("");
     
@@ -215,7 +161,6 @@ const ForgotPassword = () => {
       const code = values.code;
       setRecoveryCode(code);
       
-      // Verificar código
       const isVerified = await verifyRecoveryCode(userEmail, code);
       
       if (isVerified) {
@@ -226,20 +171,17 @@ const ForgotPassword = () => {
       setError(err.message || "Código inválido. Verifique e tente novamente.");
     }
   };
-  
-  // Redefinir senha após verificação do código
+
   const handleResetPassword = async (values: ResetPasswordValues) => {
     setError("");
     
     try {
-      // Redefinir senha
       const success = await resetPasswordWithCode(userEmail, recoveryCode, values.password);
       
       if (success) {
         toast.success("Senha redefinida com sucesso!");
         setCurrentStep(PasswordRecoveryStep.SUCCESS);
         
-        // Redirecionar para login após 3 segundos
         setTimeout(() => {
           navigate("/login", { state: { passwordReset: true } });
         }, 3000);
@@ -248,8 +190,7 @@ const ForgotPassword = () => {
       setError(err.message || "Ocorreu um erro ao redefinir sua senha. Tente novamente.");
     }
   };
-  
-  // Reenviar código
+
   const handleResendCode = async () => {
     setError("");
     
@@ -259,15 +200,12 @@ const ForgotPassword = () => {
     }
     
     try {
-      // Enviar novo código
       await sendRecoveryCode(userEmail);
       
-      // Atualizar expiração
       const expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + 15);
       setExpirationTime(expiresAt);
       
-      // Reiniciar barra de progresso
       setExpirationProgress(100);
       setTimeout(updateExpirationProgress, 0);
       
@@ -276,13 +214,12 @@ const ForgotPassword = () => {
       setError(err.message || "Ocorreu um erro ao reenviar o código. Tente novamente mais tarde.");
     }
   };
-  
+
   return (
     <AuthLayout>
       <div className="text-center mb-6">
         <h1 className="text-xl sm:text-2xl font-bold">Recuperar Senha</h1>
         
-        {/* Indicador de etapas */}
         <div className="flex justify-between mt-6 mb-8 relative">
           <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2 z-0"></div>
           
@@ -314,7 +251,6 @@ const ForgotPassword = () => {
       
       {error && <FormError error={error} />}
       
-      {/* Etapa 1: Solicitar código */}
       {currentStep === PasswordRecoveryStep.REQUEST_CODE && (
         <Form {...requestCodeForm}>
           <form onSubmit={requestCodeForm.handleSubmit(handleRequestCode)} className="space-y-4">
@@ -358,7 +294,6 @@ const ForgotPassword = () => {
         </Form>
       )}
       
-      {/* Etapa 2: Verificar código */}
       {currentStep === PasswordRecoveryStep.VERIFY_CODE && (
         <div className="space-y-4">
           <Form {...verifyCodeForm}>
@@ -393,7 +328,6 @@ const ForgotPassword = () => {
                 )}
               />
               
-              {/* Barra de progresso de expiração */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center text-xs">
                   <div className="flex items-center gap-1 text-gray-500">
@@ -472,7 +406,6 @@ const ForgotPassword = () => {
                 variant="link" 
                 className="text-clinic-yellow p-0 h-auto text-sm font-normal"
                 onClick={() => {
-                  // Exibir modal ou redirecionar para página de contato
                   toast.info("Entre em contato com o suporte: suporte@minhametaclinica.com.br", {
                     duration: 6000,
                   });
@@ -485,7 +418,6 @@ const ForgotPassword = () => {
         </div>
       )}
       
-      {/* Etapa 3: Redefinir senha */}
       {currentStep === PasswordRecoveryStep.RESET_PASSWORD && (
         <Form {...resetPasswordForm}>
           <form onSubmit={resetPasswordForm.handleSubmit(handleResetPassword)} className="space-y-4">
@@ -506,12 +438,12 @@ const ForgotPassword = () => {
                     />
                   </FormControl>
                   
-                  {/* Indicador de força da senha */}
                   {field.value.length > 0 && (
                     <div className="mt-2">
                       <Progress
                         value={calculatePasswordStrength(field.value)}
-                        className={`h-2 ${getStrengthColor(calculatePasswordStrength(field.value))}`}
+                        className="h-2"
+                        indicatorClassName={getStrengthColor(calculatePasswordStrength(field.value))}
                       />
                       <p className="text-xs mt-1 flex justify-between">
                         <span>Força:</span>
@@ -572,7 +504,6 @@ const ForgotPassword = () => {
         </Form>
       )}
       
-      {/* Etapa 4: Sucesso */}
       {currentStep === PasswordRecoveryStep.SUCCESS && (
         <div className="text-center">
           <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
