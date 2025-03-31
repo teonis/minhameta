@@ -1,153 +1,207 @@
+
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { ThumbsUp, Heart, Award, MessageSquare, Send, Globe, UserPlus, Lock } from 'lucide-react';
+import { 
+  Heart, 
+  MessageCircle, 
+  Send, 
+  Bookmark, 
+  MoreHorizontal,
+  Smile
+} from 'lucide-react';
 import { Post } from './types';
+import { toast } from 'sonner';
 
 type SocialPostCardProps = {
   post: Post;
 };
 
 const SocialPostCard = ({ post }: SocialPostCardProps) => {
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [userReactions, setUserReactions] = useState<{[key: string]: boolean}>({
-    thumbsUp: false,
-    heart: false,
-    clap: false
-  });
 
-  const formatDate = (dateString: string) => {
+  const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}s`;
+    } else if (diffInSeconds < 3600) {
+      return `${Math.floor(diffInSeconds / 60)}m`;
+    } else if (diffInSeconds < 86400) {
+      return `${Math.floor(diffInSeconds / 3600)}h`;
+    } else if (diffInSeconds < 604800) {
+      return `${Math.floor(diffInSeconds / 86400)}d`;
+    } else if (diffInSeconds < 2592000) {
+      return `${Math.floor(diffInSeconds / 604800)}w`;
+    } else {
+      return `${Math.floor(diffInSeconds / 2592000)}m`;
+    }
   };
 
-  const handleReaction = (type: 'thumbsUp' | 'heart' | 'clap') => {
-    setUserReactions(prev => ({
-      ...prev,
-      [type]: !prev[type]
-    }));
+  const handleLike = () => {
+    setLiked(!liked);
+  };
+
+  const handleSave = () => {
+    setSaved(!saved);
+  };
+
+  const handleDoubleTap = () => {
+    if (!liked) {
+      setLiked(true);
+      toast("Você curtiu esta publicação", {
+        icon: "❤️",
+        duration: 1000
+      });
+    }
   };
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
     
-    alert(`Comentário enviado: ${newComment}`);
-    setNewComment('');
+    // In a real app, this would send the data to an API
+    toast.success("Comentário adicionado");
+    setNewComment("");
   };
 
   return (
-    <Card className="p-4">
-      <div className="flex items-start gap-3 mb-3">
-        <Avatar>
-          {post.userAvatar ? (
-            <AvatarImage src={post.userAvatar} alt={post.userName} />
-          ) : (
-            <AvatarFallback className="bg-clinic-yellow text-black">{post.userInitials}</AvatarFallback>
-          )}
-        </Avatar>
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold">{post.userName}</h3>
-            <div className="flex items-center text-gray-500 text-sm">
-              {post.visibility === 'public' && <Globe className="h-3 w-3 mr-1" />}
-              {post.visibility === 'friends' && <UserPlus className="h-3 w-3 mr-1" />}
-              {post.visibility === 'private' && <Lock className="h-3 w-3 mr-1" />}
-              <span>{formatDate(post.createdAt)}</span>
-            </div>
+    <div className="border-b border-gray-200 pb-2">
+      {/* Post header */}
+      <div className="flex justify-between items-center px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-8 w-8">
+            {post.userAvatar ? (
+              <AvatarImage src={post.userAvatar} alt={post.userName} />
+            ) : (
+              <AvatarFallback className="bg-gray-200 text-gray-900">
+                {post.userInitials}
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div>
+            <p className="text-sm font-semibold">{post.userName}</p>
+            {post.location && (
+              <p className="text-xs text-gray-500">{post.location}</p>
+            )}
           </div>
-          <p className="text-gray-800 my-2">{post.content}</p>
-          {post.image && (
-            <div className="mt-2 rounded-md overflow-hidden">
-              <img src={post.image} alt="Post image" className="w-full h-auto" />
-            </div>
-          )}
         </div>
-      </div>
-
-      {/* Reactions */}
-      <div className="flex justify-between items-center border-t border-b py-2 mb-2">
-        <div className="flex gap-4">
-          <button 
-            className={`flex items-center gap-1 ${userReactions.thumbsUp ? 'text-blue-500 font-medium' : 'text-gray-500'}`}
-            onClick={() => handleReaction('thumbsUp')}
-          >
-            <ThumbsUp className="h-4 w-4" /> 
-            <span>{post.reactions.thumbsUp + (userReactions.thumbsUp ? 1 : 0)}</span>
-          </button>
-          <button 
-            className={`flex items-center gap-1 ${userReactions.heart ? 'text-red-500 font-medium' : 'text-gray-500'}`}
-            onClick={() => handleReaction('heart')}
-          >
-            <Heart className="h-4 w-4" /> 
-            <span>{post.reactions.heart + (userReactions.heart ? 1 : 0)}</span>
-          </button>
-          <button 
-            className={`flex items-center gap-1 ${userReactions.clap ? 'text-amber-500 font-medium' : 'text-gray-500'}`}
-            onClick={() => handleReaction('clap')}
-          >
-            <Award className="h-4 w-4" /> 
-            <span>{post.reactions.clap + (userReactions.clap ? 1 : 0)}</span>
-          </button>
-        </div>
-        
-        <button 
-          className="flex items-center gap-1 text-gray-500"
-          onClick={() => setShowComments(!showComments)}
-        >
-          <MessageSquare className="h-4 w-4" /> 
-          <span>{post.comments.length} Comentários</span>
+        <button>
+          <MoreHorizontal className="h-5 w-5 text-gray-500" />
         </button>
       </div>
-
-      {/* Comments section */}
-      {showComments && (
-        <div className="mt-3 space-y-3">
-          {post.comments.map(comment => (
-            <div key={comment.id} className="flex items-start gap-2 ml-4">
-              <Avatar className="h-7 w-7">
-                <AvatarFallback className="text-xs bg-gray-200">
-                  {comment.userName.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              <div className="bg-gray-100 rounded-lg p-2 text-sm flex-1">
-                <div className="font-medium">{comment.userName}</div>
-                <div>{comment.content}</div>
-              </div>
-            </div>
-          ))}
-
-          {/* Add comment form */}
-          <form onSubmit={handleCommentSubmit} className="flex items-end gap-2 mt-2">
-            <Avatar className="h-7 w-7">
-              <AvatarFallback className="text-xs bg-clinic-yellow text-black">MS</AvatarFallback>
-            </Avatar>
-            <Textarea 
-              placeholder="Adicionar um comentário..." 
-              className="min-h-[60px] flex-1 text-sm"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-            />
-            <Button 
-              type="submit" 
-              size="sm"
-              className="bg-clinic-yellow text-black hover:bg-clinic-yellow/90"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
+      
+      {/* Post image */}
+      {post.image && (
+        <div 
+          className="aspect-square w-full bg-gray-100"
+          onDoubleClick={handleDoubleTap}
+        >
+          <img 
+            src={post.image} 
+            alt="Post" 
+            className="w-full h-full object-cover"
+          />
         </div>
       )}
-    </Card>
+      
+      {/* Action buttons */}
+      <div className="flex justify-between items-center px-4 py-2">
+        <div className="flex gap-4">
+          <button onClick={handleLike}>
+            <Heart 
+              className={`h-6 w-6 ${liked ? 'text-red-500 fill-red-500' : ''}`} 
+            />
+          </button>
+          <button onClick={() => setShowComments(!showComments)}>
+            <MessageCircle className="h-6 w-6" />
+          </button>
+          <button>
+            <Send className="h-6 w-6" />
+          </button>
+        </div>
+        <button onClick={handleSave}>
+          <Bookmark 
+            className={`h-6 w-6 ${saved ? 'text-black fill-black' : ''}`} 
+          />
+        </button>
+      </div>
+      
+      {/* Likes count */}
+      <div className="px-4 pb-1">
+        <p className="text-sm font-semibold">
+          {liked 
+            ? `${post.reactions.thumbsUp + post.reactions.heart + post.reactions.clap + 1} curtidas` 
+            : `${post.reactions.thumbsUp + post.reactions.heart + post.reactions.clap} curtidas`}
+        </p>
+      </div>
+      
+      {/* Caption */}
+      <div className="px-4 pb-1">
+        <p className="text-sm">
+          <span className="font-semibold">{post.userName}</span>{' '}
+          {post.content}
+        </p>
+      </div>
+      
+      {/* Comments */}
+      <div className="px-4">
+        {post.comments.length > 0 && !showComments && (
+          <button 
+            className="text-sm text-gray-500"
+            onClick={() => setShowComments(true)}
+          >
+            Ver todos os {post.comments.length} comentários
+          </button>
+        )}
+        
+        {showComments && (
+          <div className="space-y-2 py-1">
+            {post.comments.map(comment => (
+              <p key={comment.id} className="text-sm">
+                <span className="font-semibold">{comment.userName}</span>{' '}
+                {comment.content}
+              </p>
+            ))}
+          </div>
+        )}
+        
+        <p className="text-xs text-gray-500 uppercase mt-1">
+          {formatTimeAgo(post.createdAt)}
+        </p>
+      </div>
+      
+      {/* Add comment */}
+      <div className="flex items-center px-4 py-2 mt-1 border-t border-gray-100">
+        <button className="mr-2">
+          <Smile className="h-6 w-6 text-gray-500" />
+        </button>
+        <input
+          type="text"
+          placeholder="Adicione um comentário..."
+          className="flex-1 text-sm border-none outline-none"
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleCommentSubmit(e);
+            }
+          }}
+        />
+        {newComment.trim() && (
+          <button 
+            className="text-clinic-yellow font-semibold text-sm"
+            onClick={handleCommentSubmit}
+          >
+            Publicar
+          </button>
+        )}
+      </div>
+    </div>
   );
 };
 

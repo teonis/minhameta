@@ -52,21 +52,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Function to finalize login process
   const finalizeLogin = (user: MockUser) => {
-    // Omit password when storing user data
-    const { password, mfaEnabled, ...safeUserData } = user;
-    
-    // Set user in context
-    setCurrentUser(safeUserData);
-    
-    // Set session data
-    sessionManager.resetSessionTimeout();
-    localStorage.setItem('currentUser', JSON.stringify(safeUserData));
-    localStorage.setItem('isLoggedIn', 'true');
-    
-    setIsLoading(false);
-    
-    // Log successful login
-    console.log(`User logged in: ${safeUserData.email} with role ${safeUserData.role}`);
+    try {
+      // Omit password when storing user data
+      const { password, mfaEnabled, ...safeUserData } = user;
+      
+      // Set user in context
+      setCurrentUser(safeUserData);
+      
+      // Set session data
+      sessionManager.resetSessionTimeout();
+      localStorage.setItem('currentUser', JSON.stringify(safeUserData));
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      setIsLoading(false);
+      
+      // Log successful login
+      console.log(`User logged in: ${safeUserData.email} with role ${safeUserData.role}`);
+      
+      // Show success message
+      toast.success("Login realizado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao finalizar login:", error);
+      setIsLoading(false);
+      toast.error("Erro ao processar login. Tente novamente.");
+    }
   };
 
   const login = async (email: string, password: string) => {
@@ -134,28 +143,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // In a real application, this would add to a database and send verification email
-      // For demo, we'll just simulate success
-      toast.success("Cadastro realizado com sucesso!");
-      
-      // For demo purposes, automatically login after registration
+      // For demo, create a new user object with the provided details
       const newUser = {
         id: String(MOCK_USERS.length + 1),
         email,
+        password, // In a real app, this would be hashed
         name,
         role,
         isEmailVerified: false, // would be false in real app until verified
         lastActive: new Date(),
-        createdAt: new Date()
+        createdAt: new Date(),
+        mfaEnabled: false
       };
       
-      setCurrentUser(newUser);
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      // Add the new user to our mock database (for demo purposes)
+      MOCK_USERS.push(newUser as MockUser);
+      
+      // Success message
+      toast.success("Cadastro realizado com sucesso!");
+      
+      // For demo purposes, automatically login after registration
+      const { password: _, mfaEnabled, ...safeUserData } = newUser;
+      
+      setCurrentUser(safeUserData);
+      localStorage.setItem('currentUser', JSON.stringify(safeUserData));
       localStorage.setItem('isLoggedIn', 'true');
       
       // Set session expiration
       sessionManager.resetSessionTimeout();
       
       setIsLoading(false);
+      
+      return Promise.resolve();
     } catch (error) {
       setIsLoading(false);
       throw error;
@@ -219,8 +238,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updatePassword = async (currentPassword: string, newPassword: string) => {
-    // In a real application, this would validate the current password and update it
     toast.success("Senha atualizada com sucesso!");
+  };
+
+  const logoutAllSessions = async () => {
+    try {
+      setIsLoading(true);
+      
+      // In a real app, this would invalidate all tokens in the database
+      
+      // Clear local session
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('sessionExpiresAt');
+      localStorage.removeItem('isLoggedIn');
+      
+      if (sessionManager.sessionTimeout) {
+        clearTimeout(sessionManager.sessionTimeout);
+      }
+      
+      setCurrentUser(null);
+      setIsLoading(false);
+      
+      toast.success("Todas as sessões foram encerradas com sucesso!");
+      
+      return Promise.resolve();
+    } catch (error) {
+      setIsLoading(false);
+      toast.error("Erro ao encerrar sessões. Tente novamente.");
+      return Promise.reject(error);
+    }
   };
 
   const hasPermission = (requiredRole: UserRole): boolean => {
@@ -247,6 +293,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated: !!currentUser,
     login,
     logout: handleLogout,
+    logoutAllSessions,
     register,
     verifyMFA: async (code: string) => {
       if (code === "123456" && pendingLogin) {

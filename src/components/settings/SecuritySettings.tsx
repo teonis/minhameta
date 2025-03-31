@@ -1,178 +1,257 @@
 
-import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import React, { useState } from 'react';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Shield, LogOut, AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
 
 const SecuritySettings = () => {
-  const { updatePassword } = useAuth();
-  
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
-  });
-  
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPasswordData(prev => ({ ...prev, [name]: value }));
-    setError(""); // Clear error when user types
-  };
-  
-  const validatePassword = (password: string) => {
-    const minLength = 10;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    
-    if (password.length < minLength) {
-      return `A senha deve ter pelo menos ${minLength} caracteres`;
-    }
-    
-    if (!hasUpperCase) {
-      return "A senha deve conter pelo menos uma letra maiúscula";
-    }
-    
-    if (!hasLowerCase) {
-      return "A senha deve conter pelo menos uma letra minúscula";
-    }
-    
-    if (!hasNumber) {
-      return "A senha deve conter pelo menos um número";
-    }
-    
-    if (!hasSpecialChar) {
-      return "A senha deve conter pelo menos um caractere especial";
-    }
-    
-    return "";
-  };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { updatePassword, logoutAllSessions, isLoading } = useAuth();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [sessionNotifications, setSessionNotifications] = useState(true);
+  const [confirmingLogoutAll, setConfirmingLogoutAll] = useState(false);
+
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     
-    // Validate inputs
-    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      setError("Todos os campos são obrigatórios");
-      return;
-    }
-    
-    // Validate new password
-    const passwordError = validatePassword(passwordData.newPassword);
-    if (passwordError) {
-      setError(passwordError);
-      return;
-    }
-    
-    // Check if passwords match
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError("As senhas não coincidem");
+    if (newPassword !== confirmPassword) {
+      toast.error("As senhas não coincidem");
       return;
     }
     
     try {
-      setIsSubmitting(true);
-      
-      // Call authentication service to update password
-      await updatePassword(passwordData.currentPassword, passwordData.newPassword);
-      
-      // Clear form
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: ""
-      });
-      
-      toast.success("Senha atualizada com sucesso!");
-    } catch (err) {
-      setError("Não foi possível atualizar a senha. Verifique se a senha atual está correta.");
-    } finally {
-      setIsSubmitting(false);
+      await updatePassword(currentPassword, newPassword);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      toast.error("Erro ao atualizar senha");
     }
   };
-  
+
+  const handleLogoutAllSessions = async () => {
+    try {
+      await logoutAllSessions();
+      setConfirmingLogoutAll(false);
+    } catch (error) {
+      toast.error("Erro ao encerrar todas as sessões");
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Alterar Senha</h2>
-        <p className="text-muted-foreground mb-6">
-          Sua senha deve ter pelo menos 10 caracteres e incluir letras maiúsculas, minúsculas, números e caracteres especiais.
-        </p>
-        
-        {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-6 mb-6">
-            <div className="grid gap-2">
-              <Label htmlFor="currentPassword">Senha Atual</Label>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-medium flex items-center gap-2">
+            <Shield className="h-5 w-5 text-clinic-yellow" />
+            Alterar Senha
+          </CardTitle>
+          <CardDescription>
+            Atualize sua senha regularmente para maior segurança
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handlePasswordUpdate} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="current-password">Senha Atual</Label>
+              <div className="relative">
+                <Input
+                  id="current-password"
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-500" />
+                  )}
+                </button>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="new-password">Nova Senha</Label>
+              <div className="relative">
+                <Input
+                  id="new-password"
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-500" />
+                  )}
+                </button>
+              </div>
+              <p className="text-xs text-gray-500">
+                A senha deve ter no mínimo 10 caracteres e incluir letras maiúsculas, 
+                minúsculas, números e caracteres especiais.
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
               <Input
-                id="currentPassword"
-                name="currentPassword"
+                id="confirm-password"
                 type="password"
-                value={passwordData.currentPassword}
-                onChange={handleChange}
-                placeholder="Digite sua senha atual"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
             </div>
             
-            <div className="grid gap-2">
-              <Label htmlFor="newPassword">Nova Senha</Label>
-              <Input
-                id="newPassword"
-                name="newPassword"
-                type="password"
-                value={passwordData.newPassword}
-                onChange={handleChange}
-                placeholder="Digite sua nova senha"
-              />
+            <Button type="submit" className="w-full bg-clinic-yellow text-black hover:bg-clinic-yellow/90">
+              Atualizar Senha
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-medium flex items-center gap-2">
+            <Shield className="h-5 w-5 text-clinic-yellow" />
+            Autenticação de Dois Fatores
+          </CardTitle>
+          <CardDescription>
+            Adicione uma camada extra de segurança à sua conta
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="mfa">Ativar autenticação de dois fatores</Label>
+              <p className="text-sm text-gray-500">
+                Receba um código por SMS ou use um aplicativo autenticador
+              </p>
             </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="confirmPassword">Confirme a Nova Senha</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={passwordData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirme sua nova senha"
-              />
+            <Switch
+              id="mfa"
+              checked={mfaEnabled}
+              onCheckedChange={setMfaEnabled}
+            />
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-medium flex items-center gap-2">
+            <Shield className="h-5 w-5 text-clinic-yellow" />
+            Gerenciamento de Sessões
+          </CardTitle>
+          <CardDescription>
+            Gerencie os dispositivos conectados à sua conta
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="session-notifications">Notificações de novos logins</Label>
+              <p className="text-sm text-gray-500">
+                Receba alertas quando sua conta for acessada de um novo dispositivo
+              </p>
             </div>
+            <Switch
+              id="session-notifications"
+              checked={sessionNotifications}
+              onCheckedChange={setSessionNotifications}
+            />
           </div>
           
-          <Button 
-            type="submit" 
-            className="bg-clinic-yellow text-black hover:bg-clinic-yellow/90"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Atualizando..." : "Atualizar Senha"}
-          </Button>
-        </form>
-      </div>
-      
-      <div className="border-t border-gray-200 pt-6 mt-8">
-        <h3 className="text-lg font-semibold mb-4">Sessões Ativas</h3>
-        <p className="text-muted-foreground mb-4">
-          Você está atualmente conectado neste dispositivo.
-        </p>
-        <Button variant="outline" className="border-red-300 text-red-500 hover:bg-red-50 hover:text-red-600">
-          Encerrar Todas as Sessões
-        </Button>
-      </div>
+          <Dialog open={confirmingLogoutAll} onOpenChange={setConfirmingLogoutAll}>
+            <DialogTrigger asChild>
+              <Button 
+                variant="destructive" 
+                className="w-full flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Encerrar todas as sessões
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                  Encerrar todas as sessões
+                </DialogTitle>
+                <DialogDescription>
+                  Esta ação vai desconectar todos os dispositivos conectados à sua conta. 
+                  Você precisará fazer login novamente em todos eles.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setConfirmingLogoutAll(false)}
+                  disabled={isLoading}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleLogoutAllSessions}
+                  disabled={isLoading}
+                  className="flex items-center gap-2"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="h-4 w-4" />
+                      Confirmar
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
     </div>
   );
 };

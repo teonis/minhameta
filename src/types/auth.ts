@@ -26,6 +26,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  logoutAllSessions: () => Promise<void>;
   register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
   verifyMFA: (code: string) => Promise<boolean>;
   resetPassword: (email: string) => Promise<void>;

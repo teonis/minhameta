@@ -67,6 +67,7 @@ export const useSession = (onLogout: () => void) => {
   }, [sessionTimeout, resetSessionTimeout]);
 
   return {
+    sessionTimeout,
     resetSessionTimeout,
     restoreSession,
     clearSession: () => {
