@@ -1,9 +1,6 @@
-
 import { Link } from "react-router-dom";
-
 const Footer = () => {
-  return (
-    <footer className="bg-secondary text-white pt-10 pb-6">
+  return <footer className="bg-secondary text-white pt-10 pb-6">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
@@ -44,7 +41,7 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-4 text-clinic-yellow">Contato</h3>
             <address className="not-italic text-sm">
               <p>Clínica Rocha</p>
-              <p>Email: contato@clinicarocha.com.br</p>
+              <p>Email: timerochapb@gmail.com.br</p>
               <p>Telefone: (00) 0000-0000</p>
             </address>
           </div>
@@ -54,8 +51,6 @@ const Footer = () => {
           <p>&copy; {new Date().getFullYear()} Clínica Rocha. Todos os direitos reservados.</p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
