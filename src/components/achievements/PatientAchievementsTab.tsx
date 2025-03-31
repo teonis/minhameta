@@ -1,13 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Award } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Achievement } from './types';
+import { Achievement, AchievementLevel } from './types';
 import AchievementGallery from './AchievementGallery';
 import AchievementUnlockedModal from './AchievementUnlockedModal';
 
-// Dados de exemplo para mostrar conquistas
 const mockAchievements: Achievement[] = [
   {
     id: '1',
@@ -97,14 +95,12 @@ const PatientAchievementsTab = ({ patientId }: PatientAchievementsTabProps) => {
   const [showAll, setShowAll] = useState(false);
   const [unlockedAchievement, setUnlockedAchievement] = useState<Achievement | null>(null);
   
-  // Simulação de desbloquear uma conquista aleatória para demonstração
   const unlockRandomAchievement = () => {
     const lockedAchievements = achievements.filter(a => !a.unlockedAt && !a.isHidden);
     if (lockedAchievements.length > 0) {
       const randomIndex = Math.floor(Math.random() * lockedAchievements.length);
       const achievementToUnlock = lockedAchievements[randomIndex];
       
-      // Atualizar a conquista com data de desbloqueio
       const updatedAchievements = achievements.map(a => {
         if (a.id === achievementToUnlock.id) {
           return { 
@@ -120,7 +116,6 @@ const PatientAchievementsTab = ({ patientId }: PatientAchievementsTabProps) => {
     }
   };
   
-  // Exibir uma animação de conquista desbloqueada ao montar o componente (apenas para fins de demonstração)
   useEffect(() => {
     const timer = setTimeout(() => {
       const unlockedAchievements = achievements.filter(a => a.unlockedAt);
@@ -133,13 +128,11 @@ const PatientAchievementsTab = ({ patientId }: PatientAchievementsTabProps) => {
     return () => clearTimeout(timer);
   }, []);
   
-  // Conquistas recém desbloqueadas
   const recentlyUnlocked = achievements
     .filter(a => a.unlockedAt)
     .sort((a, b) => new Date(b.unlockedAt!).getTime() - new Date(a.unlockedAt!).getTime())
     .slice(0, 4);
   
-  // Próximas conquistas a desbloquear (excluindo as escondidas)
   const nextToUnlock = achievements
     .filter(a => !a.unlockedAt && !a.isHidden)
     .slice(0, 3);
@@ -148,7 +141,6 @@ const PatientAchievementsTab = ({ patientId }: PatientAchievementsTabProps) => {
     <div className="space-y-6">
       {!showAll ? (
         <div>
-          {/* Resumo de conquistas */}
           <div className="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold flex items-center">
@@ -194,7 +186,6 @@ const PatientAchievementsTab = ({ patientId }: PatientAchievementsTabProps) => {
                     {(() => {
                       const levels = ['bronze', 'prata', 'ouro', 'diamante'] as AchievementLevel[];
                       
-                      // Encontrar o maior nível desbloqueado
                       for (let i = levels.length - 1; i >= 0; i--) {
                         const hasLevel = achievements
                           .filter(a => a.unlockedAt)
@@ -210,7 +201,6 @@ const PatientAchievementsTab = ({ patientId }: PatientAchievementsTabProps) => {
               </div>
             </div>
             
-            {/* Conquistas recentes */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-3">Conquistas Recentes</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -236,7 +226,6 @@ const PatientAchievementsTab = ({ patientId }: PatientAchievementsTabProps) => {
               </div>
             </div>
             
-            {/* Próximas conquistas */}
             {nextToUnlock.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold mb-3">Próximas Conquistas</h3>
@@ -282,7 +271,6 @@ const PatientAchievementsTab = ({ patientId }: PatientAchievementsTabProps) => {
               </div>
             )}
             
-            {/* Botão para simular o desbloqueio de uma conquista (somente para demonstração) */}
             <div className="mt-6 text-center">
               <Button
                 variant="outline"
@@ -299,7 +287,6 @@ const PatientAchievementsTab = ({ patientId }: PatientAchievementsTabProps) => {
         <AchievementGallery achievements={achievements} />
       )}
       
-      {/* Modal de conquista desbloqueada */}
       {unlockedAchievement && (
         <AchievementUnlockedModal 
           achievement={unlockedAchievement} 
