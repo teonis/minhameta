@@ -1,4 +1,5 @@
 
+import React from "react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -44,11 +45,11 @@ export const usePasswordRecoveryFlow = () => {
         
         // Show the code in a toast that stays longer
         toast.info(
-          <div className="space-y-2">
-            <p className="font-medium">Seu código de recuperação:</p>
-            <p className="font-mono text-lg tracking-widest bg-yellow-50 p-2 rounded">{displayedCode}</p>
-            <p className="text-xs">Utilize este código no passo seguinte</p>
-          </div>,
+          React.createElement("div", { className: "space-y-2" }, [
+            React.createElement("p", { className: "font-medium", key: "title" }, "Seu código de recuperação:"),
+            React.createElement("p", { className: "font-mono text-lg tracking-widest bg-yellow-50 p-2 rounded", key: "code" }, displayedCode),
+            React.createElement("p", { className: "text-xs", key: "hint" }, "Utilize este código no passo seguinte")
+          ]),
           {
             duration: 15000,
             id: "recovery-code-toast"
