@@ -1,12 +1,8 @@
 
-import { useContext } from 'react';
-import { UserRole } from '@/types/auth';
-import { AuthContext } from '@/contexts/AuthContext';
+import { User, UserRole } from '@/types/auth';
 
 export const useAuthorization = () => {
-  const { currentUser } = useContext(AuthContext);
-
-  const hasPermission = (requiredRole: UserRole): boolean => {
+  const hasPermission = (currentUser: User | null, requiredRole: UserRole): boolean => {
     if (!currentUser) return false;
     
     // Role hierarchy check

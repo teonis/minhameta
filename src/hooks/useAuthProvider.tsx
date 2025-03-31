@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { User, UserRole, MockUser } from '@/types/auth';
@@ -213,13 +214,13 @@ export const useAuthProvider = () => {
       }
       
       // In a real app, we would:
-      // 1. Check if email exists in the database (without revealing this info to the user)
-      // 2. Generate a secure token
-      // 3. Store the token with expiration time
-      // 4. Send email with reset link
+      // 1. Generate a secure, unique token
+      // 2. Store the token with the user's email and expiration time (typically 1 hour)
+      // 3. Send an email with a link containing the token
       
-      // For demo purposes, we'll simulate a successful request
+      // Log the reset request (for demo purposes)
       console.log(`Password reset requested for: ${email}`);
+      console.log(`Generated reset token would be emailed with link: /reset-password?token=${generateMockToken()}`);
       
       // Simulate delay for API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -234,16 +235,62 @@ export const useAuthProvider = () => {
     }
   };
 
-  const updatePassword = async (currentPassword: string, newPassword: string) => {
-    // Validate new password
-    if (newPassword.length < 6) {
-      toast.error("A nova senha deve ter no mínimo 6 caracteres.");
-      return Promise.reject(new Error("Senha muito curta."));
+  // Generate a mock reset token (in a real app, this would be a cryptographically secure token)
+  const generateMockToken = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+    for (let i = 0; i < 40; i++) {
+      token += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+    return token;
+  };
+
+  // Updated to handle both scenarios: changing password with current password or with reset token
+  const updatePassword = async (currentPasswordOrToken: string, newPassword: string) => {
+    setIsLoading(true);
     
-    // In a real app, we'd validate the current password and update in DB
-    toast.success("Senha atualizada com sucesso!");
-    return Promise.resolve();
+    try {
+      // Validate new password strength
+      if (newPassword.length < 6) {
+        throw new Error("A nova senha deve ter no mínimo 6 caracteres.");
+      }
+      
+      // Check if this is a token-based reset or a user-initiated password change
+      const isTokenReset = currentPasswordOrToken.length >= 20; // Assuming tokens are long
+      
+      if (isTokenReset) {
+        // This is a reset token flow - in a real app, we would validate the token
+        // and find the associated user
+        console.log(`Password reset with token: ${currentPasswordOrToken.substring(0, 10)}...`);
+        
+        // For demo purposes, we'll simulate a successful reset
+        // In a real app, we would update the user's password in the database
+        
+        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
+        
+        toast.success("Senha redefinida com sucesso!");
+      } else {
+        // This is a user changing their own password with current password
+        // In a real app, we would validate the current password against the stored hash
+        
+        if (!currentUser) {
+          throw new Error("Usuário não autenticado.");
+        }
+        
+        // For demo, just log the action
+        console.log(`User ${currentUser.email} changing password`);
+        
+        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
+        
+        toast.success("Senha atualizada com sucesso!");
+      }
+      
+      setIsLoading(false);
+      return Promise.resolve();
+    } catch (error: any) {
+      setIsLoading(false);
+      throw error;
+    }
   };
 
   const logoutAllSessions = async () => {

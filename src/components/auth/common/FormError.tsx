@@ -1,4 +1,5 @@
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 
 interface FormErrorProps {
@@ -9,13 +10,10 @@ const FormError: React.FC<FormErrorProps> = ({ error }) => {
   if (!error) return null;
   
   return (
-    <div 
-      className="bg-destructive/10 border-l-4 border-destructive text-destructive p-3 sm:p-4 mb-4 sm:mb-6 text-sm sm:text-base flex items-start" 
-      role="alert"
-    >
-      <AlertTriangle className="h-5 w-5 mr-2 flex-shrink-0" />
-      <p>{error}</p>
-    </div>
+    <Alert variant="destructive" className="mb-4 sm:mb-6">
+      <AlertTriangle className="h-4 w-4 mr-2" />
+      <AlertDescription>{error}</AlertDescription>
+    </Alert>
   );
 };
 

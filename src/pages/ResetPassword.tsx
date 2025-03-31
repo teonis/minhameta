@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -17,10 +17,16 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 
-// Novo esquema de validação com requisitos mínimos
+// Schema with password validation requirements
 const passwordSchema = z.object({
   password: z.string()
-    .min(6, { message: "A senha deve ter no mínimo 6 caracteres" }),
+    .min(6, { message: "A senha deve ter no mínimo 6 caracteres" })
+    .refine(password => /[A-Z]/.test(password), {
+      message: "A senha deve conter pelo menos uma letra maiúscula",
+    })
+    .refine(password => /[0-9]/.test(password), {
+      message: "A senha deve conter pelo menos um número",
+    }),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "As senhas não coincidem",
@@ -37,6 +43,7 @@ const ResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [resetSuccess, setResetSuccess] = useState(false);
   const navigate = useNavigate();
   const { updatePassword } = useAuth();
   const isMobile = useIsMobile();
@@ -53,50 +60,57 @@ const ResetPassword = () => {
     const tokenFromUrl = searchParams.get("token");
     setToken(tokenFromUrl);
     
-    // In a real implementation, this would verify the token with the backend
-    // For demo purposes, we'll just check if it exists
+    // Token validation logic
     if (tokenFromUrl) {
-      // Simple check for demo - a real implementation would verify this token with the server
-      const isValidToken = tokenFromUrl.length > 20;
+      // In a real implementation, we would verify the token with a backend API
+      // For this demo, we'll check if the token is at least 20 characters long
+      // and not just "token" or other simple values
+      const isValidToken = tokenFromUrl.length >= 20 && 
+                           !["token", "reset", "password", "123456"].includes(tokenFromUrl);
+      
       setTokenValid(isValidToken);
       
       if (!isValidToken) {
-        toast.error("Link de redefinição inválido ou expirado. Por favor, solicite um novo.");
+        toast.error("Link de redefinição inválido ou expirado. Solicite um novo.");
       }
     } else {
       setTokenValid(false);
-      toast.error("Link de redefinição inválido. Por favor, solicite um novo.");
+      toast.error("Link de redefinição inválido. Solicite um novo link.");
     }
   }, [searchParams]);
 
-  // Função atualizada para calcular a força da senha
+  // Calculate password strength based on multiple criteria
   const calculatePasswordStrength = (password: string) => {
     if (password.length === 0) return 0;
     
     let score = 0;
     
-    // Pontuação base para comprimento
+    // Base score for length
     if (password.length >= 6) score += 1;
     if (password.length >= 8) score += 1;
+    if (password.length >= 10) score += 1;
     
-    // Pontuação para complexidade
+    // Score for complexity
     if (/[A-Z]/.test(password)) score += 1;
     if (/[a-z]/.test(password)) score += 1;
     if (/[0-9]/.test(password)) score += 1;
     if (/[^A-Za-z0-9]/.test(password)) score += 1;
     
-    // Normaliza score para percentual (0-100)
-    return Math.min(100, (score / 6) * 100);
+    // Check for common patterns
+    if (!/123|abc|qwerty|password|senha/i.test(password)) score += 1;
+    
+    // Normalize score to percentage (0-100)
+    return Math.min(100, Math.round((score / 8) * 100));
   };
   
-  // Função para obter a cor da barra de força
+  // Get strength color
   const getStrengthColor = (strength: number) => {
     if (strength < 30) return "bg-red-500";
     if (strength < 70) return "bg-yellow-500";
     return "bg-green-500";
   };
   
-  // Função para obter o texto do nível de força
+  // Get strength text
   const getStrengthText = (strength: number) => {
     if (strength < 30) return "Fraca";
     if (strength < 70) return "Média";
@@ -105,24 +119,27 @@ const ResetPassword = () => {
 
   const onSubmit = async (data: PasswordFormValues) => {
     if (!token || !tokenValid) {
-      toast.error("Link de redefinição inválido ou expirado. Por favor, solicite um novo.");
+      toast.error("Link de redefinição inválido ou expirado. Solicite um novo.");
       return;
     }
     
     setIsSubmitting(true);
     
     try {
-      // In a real implementation, you would send the token and new password to your API
-      // For demo purposes, we'll simulate success after a short delay
+      // In a real implementation, we would send the token and new password to backend API
+      // For demo, we're simulating the API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simulate API call
-      // await updatePassword(data.password, token);
+      // Simulate password update with token
+      await updatePassword(token, data.password);
       
+      setResetSuccess(true);
       toast.success("Sua senha foi alterada com sucesso!");
+      
+      // Redirect to login after a delay
       setTimeout(() => {
         navigate("/login", { state: { passwordReset: true } });
-      }, 2000);
+      }, 3000);
     } catch (error: any) {
       toast.error(error.message || "Ocorreu um erro ao redefinir sua senha. Tente novamente.");
     } finally {
@@ -137,6 +154,7 @@ const ResetPassword = () => {
         <Navbar />
         <main className="flex-grow flex items-center justify-center">
           <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-clinic-yellow mx-auto mb-4"></div>
             <p>Verificando seu link de redefinição...</p>
           </div>
         </main>
@@ -158,14 +176,29 @@ const ResetPassword = () => {
               <p className="text-sm sm:text-base text-gray-600 mb-6">
                 O link de redefinição de senha que você usou é inválido ou expirou.
               </p>
-              <Link to="/forgot-password" className="text-clinic-yellow hover:underline text-sm sm:text-base">
-                Solicitar novo link
+              <Link to="/forgot-password">
+                <Button variant="outline" className="mb-4">
+                  Solicitar novo link
+                </Button>
               </Link>
               <div className="mt-4 border-t pt-4">
                 <Link to="/login" className="text-gray-600 hover:text-clinic-yellow text-sm sm:text-base">
                   Voltar para o login
                 </Link>
               </div>
+            </div>
+          ) : resetSuccess ? (
+            <div className="text-center">
+              <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+              <h1 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Senha Redefinida com Sucesso!</h1>
+              <p className="text-sm sm:text-base text-gray-600 mb-6">
+                Sua senha foi alterada. Redirecionando para a página de login...
+              </p>
+              <Link to="/login">
+                <Button className="bg-clinic-yellow text-black hover:bg-clinic-yellow/90">
+                  Ir para o Login
+                </Button>
+              </Link>
             </div>
           ) : (
             <>
@@ -212,22 +245,26 @@ const ResetPassword = () => {
                           </button>
                         </div>
                         
-                        {/* Barra de força da senha atualizada */}
+                        {/* Password strength indicator */}
                         {field.value.length > 0 && (
                           <div className="mt-2">
                             <Progress
                               value={passwordStrength}
-                              className="h-2"
+                              className={`h-2 ${getStrengthColor(passwordStrength)}`}
                             />
-                            <p className="text-xs mt-1" style={{ color: getStrengthColor(passwordStrength).replace('bg-', 'text-') }}>
-                              {getStrengthText(passwordStrength)}
+                            <p className="text-xs mt-1 flex justify-between">
+                              <span>Força:</span>
+                              <span className={
+                                passwordStrength < 30 ? "text-red-500" : 
+                                passwordStrength < 70 ? "text-yellow-500" : "text-green-500"
+                              }>{getStrengthText(passwordStrength)}</span>
                             </p>
                           </div>
                         )}
                         
                         <FormDescription id="password-requirements" className="text-xs text-gray-500 mt-2">
-                          Sua senha deve ter no mínimo 6 caracteres. Para maior segurança, inclua letras maiúsculas,
-                          minúsculas, números e caracteres especiais.
+                          Sua senha deve ter no mínimo 6 caracteres, incluir pelo menos uma letra maiúscula
+                          e um número.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

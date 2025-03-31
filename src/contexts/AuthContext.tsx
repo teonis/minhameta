@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   } = useAuthProvider();
 
   // Use the authorization hook
-  const { hasPermission } = useAuthorization();
+  const { hasPermission: authHasPermission } = useAuthorization();
 
   // Create the context value
   const value: AuthContextType = {
@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     verifyMFA,
     resetPassword,
     updatePassword,
-    hasPermission
+    hasPermission: (requiredRole: UserRole) => authHasPermission(currentUser, requiredRole)
   };
 
   return (
