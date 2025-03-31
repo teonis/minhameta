@@ -1,7 +1,8 @@
 
-import { Check, Clock, AlertTriangle } from "lucide-react";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { GoalType } from "@/types/professional";
+import GoalStatusBadge from "./GoalStatusBadge";
+import GoalPriorityBadge from "./GoalPriorityBadge";
 
 type PatientGoalsTableProps = {
   patientGoals: GoalType[];
@@ -36,38 +37,10 @@ const PatientGoalsTable = ({ patientGoals }: PatientGoalsTableProps) => {
                   <div className="text-sm text-gray-500">{goal.description.substring(0, 60)}...</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {goal.status === "completed" && (
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      <Check className="h-4 w-4 mr-1" /> Concluída
-                    </span>
-                  )}
-                  {goal.status === "in-progress" && (
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      <Clock className="h-4 w-4 mr-1" /> Em Progresso
-                    </span>
-                  )}
-                  {goal.status === "pending" && (
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                      <AlertTriangle className="h-4 w-4 mr-1" /> Pendente
-                    </span>
-                  )}
+                  <GoalStatusBadge status={goal.status} />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {goal.priority === "alta" && (
-                    <span className="px-2 py-1 text-xs rounded bg-red-100 text-red-800">
-                      Alta
-                    </span>
-                  )}
-                  {goal.priority === "média" && (
-                    <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
-                      Média
-                    </span>
-                  )}
-                  {goal.priority === "baixa" && (
-                    <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
-                      Baixa
-                    </span>
-                  )}
+                  <GoalPriorityBadge priority={goal.priority} />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {goal.dueDate}
