@@ -42,7 +42,7 @@ const Footer = () => {
             <address className="not-italic text-sm">
               <p>Clínica Rocha</p>
               <p>Email: timerochapb@gmail.com.br</p>
-              <p>Telefone: (00) 0000-0000</p>
+              <p>Telefone: (83) 99643-2717</p>
             </address>
           </div>
         </div>
