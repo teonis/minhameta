@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { LogOut, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import UserRoleBadge from './auth/UserRoleBadge';
 
@@ -29,6 +29,15 @@ const AuthStatus: React.FC = () => {
           {currentUser.name || <UserRoleBadge role={currentUser.role} showLabel />}
         </span>
       </div>
+      
+      <Link 
+        to="/configuracoes"
+        className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-800"
+      >
+        <Settings size={16} />
+        <span className="hidden sm:inline">Configurações</span>
+      </Link>
+      
       <button 
         onClick={handleLogout}
         className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800"
