@@ -11,6 +11,7 @@ import AboutApp from "./pages/AboutApp";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import ProfessionalDashboard from "./pages/ProfessionalDashboard";
 import PatientDashboard from "./pages/PatientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/profissional/dashboard" element={<ProfessionalDashboard />} />
             <Route path="/paciente/dashboard" element={<PatientDashboard />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />

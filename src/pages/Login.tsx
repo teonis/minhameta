@@ -41,7 +41,12 @@ const Login = () => {
     if (isAuthenticated) {
       navigate(returnTo);
     }
-  }, [isAuthenticated, navigate, returnTo]);
+    
+    // Show success message if coming from password reset
+    if (location.state?.passwordReset) {
+      toast.success("Senha redefinida com sucesso! Você já pode fazer login com sua nova senha.");
+    }
+  }, [isAuthenticated, navigate, returnTo, location.state]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
@@ -99,6 +98,9 @@ const MOCK_USERS = [
 
 // Failed login attempts tracking
 const loginAttempts: Record<string, { count: number, lockedUntil?: Date }> = {};
+
+// Password reset requests tracking
+const passwordResetRequests: Record<string, { count: number, lastRequestTime: Date }> = {};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -319,8 +321,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetPassword = async (email: string) => {
-    // In a real application, this would send a reset token via email
-    toast.success("Se o email estiver cadastrado, você receberá instruções para recuperação de senha.");
+    setIsLoading(true);
+    
+    try {
+      // Check if email is in valid format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        throw new Error("Formato de email inválido.");
+      }
+      
+      // Rate limiting check
+      const now = new Date();
+      if (passwordResetRequests[email]) {
+        const hoursSinceLastRequest = (now.getTime() - passwordResetRequests[email].lastRequestTime.getTime()) / (1000 * 60 * 60);
+        
+        // If less than 24 hours since last request and already made 3 requests
+        if (hoursSinceLastRequest < 24 && passwordResetRequests[email].count >= 3) {
+          const hoursRemaining = Math.ceil(24 - hoursSinceLastRequest);
+          throw new Error(`Limite de solicitações excedido. Tente novamente em ${hoursRemaining} horas.`);
+        }
+        
+        // If it's been more than 24 hours, reset the count
+        if (hoursSinceLastRequest >= 24) {
+          passwordResetRequests[email] = { count: 1, lastRequestTime: now };
+        } else {
+          // Otherwise increment the count
+          passwordResetRequests[email].count += 1;
+          passwordResetRequests[email].lastRequestTime = now;
+        }
+      } else {
+        // First request for this email
+        passwordResetRequests[email] = { count: 1, lastRequestTime: now };
+      }
+      
+      // In a real app, we would:
+      // 1. Check if email exists in the database (without revealing this info to the user)
+      // 2. Generate a secure token
+      // 3. Store the token with expiration time
+      // 4. Send email with reset link
+      
+      // For demo purposes, we'll simulate a successful request
+      console.log(`Password reset requested for: ${email}`);
+      
+      // Simulate delay for API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsLoading(false);
+      
+      // We don't confirm if the email exists or not to prevent email enumeration
+      return Promise.resolve();
+    } catch (error: any) {
+      setIsLoading(false);
+      throw error;
+    }
   };
 
   const updatePassword = async (currentPassword: string, newPassword: string) => {
