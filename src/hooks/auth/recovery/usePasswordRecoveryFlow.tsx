@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -28,22 +27,17 @@ export const usePasswordRecoveryFlow = () => {
     clearDisplayedCode
   } = useRecoveryCode();
 
-  // Handle coming from the alternative code page
   const handleAlternativeCodeRedirect = () => {
     if (location.state?.alternativeCodeGenerated) {
-      // If we have a recovery email from the state, use it
       if (location.state.recoveryEmail) {
         setUserEmail(location.state.recoveryEmail);
       }
       
-      // If we have a displayed code, show it to the user
       if (displayedCode) {
-        // Set expiration time (15 minutes from now)
         const expiresAt = new Date();
         expiresAt.setMinutes(expiresAt.getMinutes() + 15);
         setExpirationTime(expiresAt);
         
-        // Show the code in a toast that stays longer
         toast.info(
           React.createElement("div", { className: "space-y-2" }, [
             React.createElement("p", { className: "font-medium", key: "title" }, "Seu código de recuperação:"),
@@ -56,7 +50,6 @@ export const usePasswordRecoveryFlow = () => {
           }
         );
         
-        // Automatically proceed to code verification step
         setCurrentStep(PasswordRecoveryStep.VERIFY_CODE);
       }
     }
@@ -107,7 +100,6 @@ export const usePasswordRecoveryFlow = () => {
       const success = await resetPasswordWithCode(userEmail, recoveryCode, values.password);
       
       if (success) {
-        // Clear the displayed code since we've completed the flow
         clearDisplayedCode();
         
         toast.success("Senha redefinida com sucesso!");
