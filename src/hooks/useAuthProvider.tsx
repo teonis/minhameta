@@ -35,7 +35,12 @@ export const useAuthProvider = () => {
   } = useLogout(setCurrentUser, sessionManager.clearSession);
 
   // Initialize password reset handler
-  const { resetPassword, updatePassword } = usePasswordReset();
+  const { resetPassword, updatePassword: baseUpdatePassword } = usePasswordReset();
+  
+  // Wrap updatePassword to include currentUser
+  const updatePassword = (currentPasswordOrToken: string, newPassword: string) => {
+    return baseUpdatePassword(currentPasswordOrToken, newPassword, currentUser);
+  };
 
   // Initialize registration handler
   const { register } = useRegistration(setCurrentUser, sessionManager.resetSessionTimeout);

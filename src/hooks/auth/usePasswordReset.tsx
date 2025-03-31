@@ -1,6 +1,8 @@
+
 import { useState } from 'react';
 import { passwordResetRequests } from '@/data/mockUsers';
 import { toast } from "sonner";
+import { User } from '@/types/auth';
 
 export const usePasswordReset = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +57,7 @@ export const usePasswordReset = () => {
     }
   };
 
-  const updatePassword = async (currentPasswordOrToken: string, newPassword: string) => {
+  const updatePassword = async (currentPasswordOrToken: string, newPassword: string, currentUser?: User | null) => {
     setIsLoading(true);
     
     try {
