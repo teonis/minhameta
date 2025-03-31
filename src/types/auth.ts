@@ -29,8 +29,10 @@ export interface AuthContextType {
   logoutAllSessions: () => Promise<void>;
   register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
   verifyMFA: (code: string) => Promise<boolean>;
-  resetPassword: (email: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<string>;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  verifyRecoveryCode: (email: string, code: string) => Promise<boolean>;
+  resetPasswordWithCode: (email: string, code: string, newPassword: string) => Promise<boolean>;
   hasPermission: (requiredRole: UserRole) => boolean;
 }
 

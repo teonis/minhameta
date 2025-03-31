@@ -7,6 +7,7 @@ import { useLogin } from '@/hooks/auth/useLogin';
 import { useLogout } from '@/hooks/auth/useLogout';
 import { usePasswordReset } from '@/hooks/auth/usePasswordReset';
 import { useRegistration } from '@/hooks/auth/useRegistration';
+import { useRecoveryCode } from '@/hooks/auth/useRecoveryCode';
 
 export const useAuthProvider = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -34,12 +35,24 @@ export const useAuthProvider = () => {
     logoutAllSessions
   } = useLogout(setCurrentUser, sessionManager.clearSession);
 
-  // Initialize password reset handler
-  const { resetPassword, updatePassword: baseUpdatePassword } = usePasswordReset();
+  // Initialize password reset handler (legacy)
+  const { resetPassword: legacyResetPassword, updatePassword: baseUpdatePassword } = usePasswordReset();
+  
+  // Initialize recovery code handler (new system)
+  const { 
+    sendRecoveryCode, 
+    verifyRecoveryCode, 
+    resetPasswordWithCode 
+  } = useRecoveryCode();
   
   // Wrap updatePassword to include currentUser
   const updatePassword = (currentPasswordOrToken: string, newPassword: string) => {
     return baseUpdatePassword(currentPasswordOrToken, newPassword, currentUser);
+  };
+
+  // Unified resetPassword function that uses the new recovery code system
+  const resetPassword = async (email: string) => {
+    return sendRecoveryCode(email);
   };
 
   // Initialize registration handler
@@ -64,6 +77,8 @@ export const useAuthProvider = () => {
     resetPassword,
     updatePassword,
     verifyMFA,
+    verifyRecoveryCode,
+    resetPasswordWithCode,
     MFADialog
   };
 };

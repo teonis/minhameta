@@ -20,6 +20,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     resetPassword,
     updatePassword,
     verifyMFA,
+    verifyRecoveryCode,
+    resetPasswordWithCode,
     MFADialog
   } = useAuthProvider();
 
@@ -38,6 +40,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     verifyMFA,
     resetPassword,
     updatePassword,
+    verifyRecoveryCode,
+    resetPasswordWithCode,
     hasPermission: (requiredRole: UserRole) => authHasPermission(currentUser, requiredRole)
   };
 
