@@ -7,7 +7,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Progress } from "@/components/ui/progress";
-import { Clock, RefreshCw } from "lucide-react";
+import { Clock, RefreshCw, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import FormError from "@/components/auth/common/FormError";
 
