@@ -3,7 +3,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User, Shield } from 'lucide-react';
 import { toast } from "sonner";
-import { useAuth, UserRole } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { UserRole } from '@/types/auth';
 
 const AuthStatus: React.FC = () => {
   const navigate = useNavigate();
