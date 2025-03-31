@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
@@ -23,34 +22,28 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
   const navigate = useNavigate();
   const { register } = useAuth();
   
-  // Função para calcular a força da senha
   const calculatePasswordStrength = (password: string) => {
     if (password.length === 0) return 0;
     
     let score = 0;
     
-    // Pontuação base para comprimento
     if (password.length >= 6) score += 1;
     if (password.length >= 8) score += 1;
     
-    // Pontuação para complexidade
     if (/[A-Z]/.test(password)) score += 1;
     if (/[a-z]/.test(password)) score += 1;
     if (/[0-9]/.test(password)) score += 1;
     if (/[^A-Za-z0-9]/.test(password)) score += 1;
     
-    // Normaliza score para percentual (0-100)
     return Math.min(100, (score / 6) * 100);
   };
   
-  // Função para obter a cor da barra de força
   const getStrengthColor = (strength: number) => {
     if (strength < 30) return "bg-red-500";
     if (strength < 70) return "bg-yellow-500";
     return "bg-green-500";
   };
   
-  // Função para obter o texto do nível de força
   const getStrengthText = (strength: number) => {
     if (strength < 30) return "Fraca";
     if (strength < 70) return "Média";
@@ -66,14 +59,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
       return;
     }
     
-    // Validate email format
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       setError("Formato de email inválido");
       return;
     }
     
-    // Validate password length
     if (password.length < 6) {
       setError("Senha deve ter no mínimo 6 caracteres");
       return;
@@ -85,16 +76,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
     }
     
     try {
-      // Convert userType string to UserRole enum
       const role = userType === "professional" 
         ? UserRole.PROFESSIONAL 
         : UserRole.PATIENT;
       
       await register(name, email, password, role);
       
-      // Registration success notification is shown by auth provider
-      
-      // Redirect to appropriate dashboard
       navigate(returnTo);
     } catch (err: any) {
       setError(err.message || "Falha no cadastro. Tente novamente mais tarde.");
@@ -199,10 +186,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ returnTo }) => {
           </button>
         </div>
         
-        {/* Barra de força da senha */}
         {password.length > 0 && (
           <div className="mt-2">
-            <Progress value={passwordStrength} className="h-2" indicatorClassName={getStrengthColor(passwordStrength)} />
+            <Progress value={passwordStrength} className="h-2" />
             <p className="text-xs text-gray-500 mt-1">
               Força: {getStrengthText(passwordStrength)}
             </p>
