@@ -85,9 +85,6 @@ const SocialPostCard = ({ post }: SocialPostCardProps) => {
           </Avatar>
           <div>
             <p className="text-sm font-semibold">{post.userName}</p>
-            {post.location && (
-              <p className="text-xs text-gray-500">{post.location}</p>
-            )}
           </div>
         </div>
         <button>

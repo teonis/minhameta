@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -106,7 +105,6 @@ const FeedTab = ({ posts }: FeedTabProps) => {
     }));
   };
   
-  // Pull to refresh implementation
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       startY.current = e.touches[0].clientY;
@@ -191,9 +189,6 @@ const FeedTab = ({ posts }: FeedTabProps) => {
               </Avatar>
               <div>
                 <p className="text-sm font-semibold">{post.userName}</p>
-                {post.location && (
-                  <p className="text-xs text-gray-500">{post.location}</p>
-                )}
               </div>
             </div>
             <button>
