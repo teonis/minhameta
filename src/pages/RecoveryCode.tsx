@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthLayout from "@/components/auth/AuthLayout";
 import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -125,6 +126,3 @@ const RecoveryCode = () => {
 };
 
 export default RecoveryCode;
-
-// Importação necessária para o botão faltante
-import { Button } from "@/components/ui/button";
