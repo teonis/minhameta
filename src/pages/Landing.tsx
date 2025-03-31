@@ -20,7 +20,7 @@ const Landing = () => {
               <div className="space-y-4 md:space-y-6">
                 <Link to="/ia" className="inline-flex items-center gap-2 bg-white/80 text-clinic-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm hover:bg-white hover:shadow-md transition-all">
                   <Sparkles size={16} className="text-clinic-yellow" />
-                  Desenvolvido com o poder da IA
+                  Clínica Rocha + Poder da IA, clique para saber mais
                 </Link>
                 <h1 className="text-3xl md:text-5xl font-bold">
                   Transformando metas em{" "}
