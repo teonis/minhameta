@@ -43,32 +43,49 @@ Nossa jornada começou com o Time Rocha, um grupo focado em promover saúde e pe
             
             <div className="mb-8 sm:mb-12 card-highlight pl-4 sm:pl-6">
               <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Nossa Missão</h3>
-              <p className="text-sm sm:text-base text-gray-700">
-                Promover a saúde mental e o bem-estar dos nossos pacientes através de abordagens terapêuticas baseadas em evidências, personalizadas para as necessidades individuais de cada pessoa, e acompanhamento contínuo que garanta resultados efetivos e duradouros.
-              </p>
+              <p className="text-sm sm:text-base text-gray-700">Nossa missão vai além do tratamento clínico tradicional: queremos elevar você ao seu melhor desempenho, com saúde plena e qualidade de vida real. Cada atendimento é uma oportunidade única de gerar transformação duradoura e significativa.
+
+Na Clínica Rocha, trabalhamos para:
+
+Personalizar cada estratégia de saúde e performance.
+
+Inspirar hábitos e mentalidades vencedoras.
+
+Construir uma comunidade que respira motivação e conquistas.
+
+Oferecer excelência técnica e acolhimento humano em cada consulta.
+
+Nosso compromisso é um só: levar você ao seu próximo nível.</p>
             </div>
             
             <div className="mb-8 sm:mb-12 card-highlight pl-4 sm:pl-6">
               <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Nossa Equipe</h3>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">
-                Nossa equipe é formada por profissionais altamente qualificados, com formação sólida e constante atualização nas mais recentes técnicas e abordagens terapêuticas.
-              </p>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">
-                Os fundadores, Dra. Tay Rocha (Psicóloga Comportamental) e Dr. Teonis Rocha (Terapeuta Cognitivo), lideram um time multidisciplinar que inclui psicólogos, psiquiatras, terapeutas ocupacionais e coaches, garantindo uma abordagem integrada ao tratamento.
-              </p>
-              <p className="text-sm sm:text-base text-gray-700">
-                Todos os nossos profissionais compartilham da mesma filosofia: tratar cada paciente com empatia, respeito e dedicação, criando um vínculo terapêutico forte que potencializa os resultados do tratamento.
-              </p>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">O poder da Clínica Rocha está na força da nossa equipe. Unimos os melhores profissionais em saúde para cuidar de você em cada etapa do caminho rumo aos seus objetivos.
+
+Aqui você encontra:</p>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Médicos especialistas em cardiologia, nutrologia, ginecologia e ortopedia, dedicados à excelência em resultados clínicos.
+
+Nutricionistas e profissionais do exercício físico preparados para transformar sua alimentação e seu corpo com planos altamente personalizados.
+
+Fisioterapeutas e odontologistas comprometidos com tratamentos que melhoram sua saúde, autoestima e qualidade de vida.</p>
+              <p className="text-sm sm:text-base text-gray-700">Cada profissional da Clínica Rocha passa por um rigoroso treinamento em atendimento humanizado e técnicas de alta performance. Não basta ser especialista: é preciso ter paixão por cuidar de você.
+
+Sua meta é nosso propósito. Sua vitória é nossa maior recompensa.
+
+            </p>
             </div>
             
             <div className="mb-8 sm:mb-12 card-highlight pl-4 sm:pl-6">
               <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Nossas Instalações</h3>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">
-                Localizada em um ambiente tranquilo e acessível, nossa clínica foi projetada para proporcionar conforto e privacidade aos nossos pacientes.
-              </p>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Localizada em um ambiente tranquilo e acessível, nossa clínica foi projetada para proporcionar conforto e privacidade aos nossos pacientes.
+Atualmente, contamos com duas unidades completas e de fácil acesso:
+            </p>
               <p className="text-sm sm:text-base text-gray-700">
-                Contamos com consultórios amplos e acolhedores, equipados com tecnologia de ponta que nos permite oferecer tratamentos inovadores, além de espaços comuns para atividades em grupo e momentos de relaxamento.
-              </p>
+João Pessoa – Ecomedical SUL
+Uma estrutura ampla com 120 m², localizada estrategicamente para proporcionar máxima conveniência. Aqui, você encontra consultórios modernos, equipamentos avançados, e ambientes dedicados à cardiologia, fisioterapia, ginecologia, ortopedia, odontologia e muito mais.
+
+Guarabira – Shopping Cidade Luz
+Nossa clínica de 90 m² dentro do Shopping Cidade Luz garante acesso facilitado e praticidade no seu dia a dia. Com espaços planejados para um atendimento acolhedor e eficiente, oferecemos serviços completos com o padrão de qualidade Rocha que você já conhece.</p>
             </div>
             
             <div className="card-highlight pl-4 sm:pl-6">
