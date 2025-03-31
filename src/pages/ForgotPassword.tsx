@@ -1,16 +1,17 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "@/components/auth/AuthLayout";
 import { toast } from "sonner";
 import { useRecoveryCode } from "@/hooks/auth/useRecoveryCode";
 
-// Import our new component files
+// Import our component files
 import ProgressSteps, { PasswordRecoveryStep } from "@/components/auth/password/recovery/ProgressSteps";
 import RequestCodeStep, { RequestCodeValues } from "@/components/auth/password/recovery/RequestCodeStep";
 import VerifyCodeStep, { VerifyCodeValues } from "@/components/auth/password/recovery/VerifyCodeStep";
 import ResetPasswordStep, { ResetPasswordValues } from "@/components/auth/password/recovery/ResetPasswordStep";
 import SuccessStep from "@/components/auth/password/recovery/SuccessStep";
+import { Card, CardContent } from "@/components/ui/card";
 
 const ForgotPassword = () => {
   const [currentStep, setCurrentStep] = useState<PasswordRecoveryStep>(PasswordRecoveryStep.REQUEST_CODE);
@@ -19,14 +20,25 @@ const ForgotPassword = () => {
   const [recoveryCode, setRecoveryCode] = useState("");
   const [expirationTime, setExpirationTime] = useState<Date | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   
   const { 
     sendRecoveryCode, 
     verifyRecoveryCode, 
     resetPasswordWithCode, 
     isLoading, 
-    canResend 
+    canResend,
+    displayedCode 
   } = useRecoveryCode();
+
+  // Se veio da página de código alternativo, mostrar o código na tela
+  useEffect(() => {
+    if (location.state?.alternativeCodeGenerated && displayedCode) {
+      toast.info(`Seu código de recuperação: ${displayedCode}`, {
+        duration: 10000,
+      });
+    }
+  }, [location.state, displayedCode]);
 
   const handleRequestCode = async (values: RequestCodeValues) => {
     setError("");
@@ -120,39 +132,51 @@ const ForgotPassword = () => {
         </p>
       </div>
       
-      {currentStep === PasswordRecoveryStep.REQUEST_CODE && (
-        <RequestCodeStep 
-          onSubmit={handleRequestCode} 
-          error={error} 
-          isLoading={isLoading} 
-        />
-      )}
-      
-      {currentStep === PasswordRecoveryStep.VERIFY_CODE && (
-        <VerifyCodeStep 
-          userEmail={userEmail}
-          expirationTime={expirationTime}
-          onSubmit={handleVerifyCode} 
-          onBack={() => setCurrentStep(PasswordRecoveryStep.REQUEST_CODE)}
-          onResend={handleResendCode}
-          error={error} 
-          isLoading={isLoading}
-          canResend={canResend}
-        />
-      )}
-      
-      {currentStep === PasswordRecoveryStep.RESET_PASSWORD && (
-        <ResetPasswordStep 
-          onSubmit={handleResetPassword} 
-          onBack={() => setCurrentStep(PasswordRecoveryStep.VERIFY_CODE)}
-          error={error} 
-          isLoading={isLoading} 
-        />
-      )}
-      
-      {currentStep === PasswordRecoveryStep.SUCCESS && (
-        <SuccessStep redirectToLogin={redirectToLogin} />
-      )}
+      <Card>
+        <CardContent className="pt-6">
+          {displayedCode && currentStep === PasswordRecoveryStep.REQUEST_CODE && (
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-center">
+              <p className="text-sm font-medium">Um código de recuperação já foi gerado:</p>
+              <p className="text-lg font-mono tracking-widest mt-1">{displayedCode}</p>
+              <p className="text-xs text-gray-500 mt-1">Anote este código e clique em Enviar para prosseguir</p>
+            </div>
+          )}
+          
+          {currentStep === PasswordRecoveryStep.REQUEST_CODE && (
+            <RequestCodeStep 
+              onSubmit={handleRequestCode} 
+              error={error} 
+              isLoading={isLoading} 
+            />
+          )}
+          
+          {currentStep === PasswordRecoveryStep.VERIFY_CODE && (
+            <VerifyCodeStep 
+              userEmail={userEmail}
+              expirationTime={expirationTime}
+              onSubmit={handleVerifyCode} 
+              onBack={() => setCurrentStep(PasswordRecoveryStep.REQUEST_CODE)}
+              onResend={handleResendCode}
+              error={error} 
+              isLoading={isLoading}
+              canResend={canResend}
+            />
+          )}
+          
+          {currentStep === PasswordRecoveryStep.RESET_PASSWORD && (
+            <ResetPasswordStep 
+              onSubmit={handleResetPassword} 
+              onBack={() => setCurrentStep(PasswordRecoveryStep.VERIFY_CODE)}
+              error={error} 
+              isLoading={isLoading} 
+            />
+          )}
+          
+          {currentStep === PasswordRecoveryStep.SUCCESS && (
+            <SuccessStep redirectToLogin={redirectToLogin} />
+          )}
+        </CardContent>
+      </Card>
     </AuthLayout>
   );
 };

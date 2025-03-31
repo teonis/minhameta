@@ -11,6 +11,12 @@ const BackToLogin: React.FC = () => {
           Voltar para o login
         </Link>
       </p>
+      <p className="text-xs text-gray-500 mt-2">
+        Problemas com o email?{" "}
+        <Link to="/recovery-code" className="text-clinic-yellow hover:underline">
+          Usar código alternativo
+        </Link>
+      </p>
     </div>
   );
 };

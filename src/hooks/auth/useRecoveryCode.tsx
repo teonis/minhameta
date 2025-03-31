@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from "sonner";
 
@@ -13,10 +12,20 @@ interface RecoveryCodeData {
 // Em um ambiente real, isso estaria no banco de dados
 const recoveryCodesStore: Record<string, RecoveryCodeData> = {};
 
+// Códigos de recuperação fixos para recuperação alternativa
+// Em um ambiente real, isso seria gerenciado de forma segura no backend
+const fallbackRecoveryCodes: Record<string, string> = {
+  'admin@clinicarocha.com': '123456',
+  'teonisr@gmail.com': '654321',
+  'profissional@clinicarocha.com': '987654',
+  'paciente@email.com': '456789'
+};
+
 export const useRecoveryCode = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [codeExpiration, setCodeExpiration] = useState<Date | null>(null);
   const [canResend, setCanResend] = useState(true);
+  const [displayedCode, setDisplayedCode] = useState<string | null>(null);
 
   // Gerar código de recuperação de 6 dígitos
   const generateRecoveryCode = (): string => {
@@ -52,8 +61,10 @@ export const useRecoveryCode = () => {
 
       setCodeExpiration(expiresAt);
       
+      // Mostrar código na interface (simulando envio por email)
+      setDisplayedCode(code);
+      
       // Em um ambiente real, aqui enviaríamos o email com o código
-      // Usando um serviço como SendGrid ou Amazon SES
       console.log(`Código de recuperação para ${email}: ${code}`);
       console.log(`Expira em: ${expiresAt.toLocaleTimeString()}`);
       
@@ -64,6 +75,50 @@ export const useRecoveryCode = () => {
 
       // Simulação da latência de API
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsLoading(false);
+      return code;
+    } catch (error: any) {
+      setIsLoading(false);
+      throw error;
+    }
+  };
+
+  // Usar código de recuperação alternativo baseado no email
+  const useFallbackRecoveryCode = async (email: string): Promise<string | null> => {
+    setIsLoading(true);
+    
+    try {
+      // Verificar formato do email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        throw new Error("Formato de email inválido.");
+      }
+
+      // Verificar se existe código fixo para este email
+      if (!fallbackRecoveryCodes[email]) {
+        throw new Error("Email não encontrado no sistema.");
+      }
+      
+      const code = fallbackRecoveryCodes[email];
+      
+      // Definir expiração (15 minutos)
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+      
+      // Armazenar código
+      recoveryCodesStore[email] = {
+        code,
+        expiresAt,
+        attempts: 0,
+        used: false
+      };
+
+      setCodeExpiration(expiresAt);
+      setDisplayedCode(code);
+      
+      // Simulação da latência de API
+      await new Promise(resolve => setTimeout(resolve, 800));
       
       setIsLoading(false);
       return code;
@@ -162,13 +217,21 @@ export const useRecoveryCode = () => {
     }
   };
 
+  // Limpar código exibido
+  const clearDisplayedCode = () => {
+    setDisplayedCode(null);
+  };
+
   return {
     isLoading,
     codeExpiration,
     canResend,
+    displayedCode,
     sendRecoveryCode,
+    useFallbackRecoveryCode,
     verifyRecoveryCode,
     resetPasswordWithCode,
-    invalidateCode
+    invalidateCode,
+    clearDisplayedCode
   };
 };
