@@ -91,10 +91,10 @@ Nossa clínica de 90 m² dentro do Shopping Cidade Luz garante acesso facilitado
             <div className="card-highlight pl-4 sm:pl-6">
               <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Diferenciais</h3>
               <ul className="text-sm sm:text-base text-gray-700 space-y-2">
-                <li>• Atendimento personalizado e focado em resultados</li>
-                <li>• Abordagem integrativa que considera aspectos físicos, mentais e sociais</li>
-                <li>• Uso de tecnologia para monitoramento e acompanhamento contínuo</li>
-                <li>• Desenvolvimento de planos terapêuticos individualizados</li>
+                <li>✅ Atendimento Humanizado: Valorizamos o acolhimento e a conexão emocional com cada paciente.</li>
+                <li>✅ Tratamentos Personalizados: Planos de saúde e performance desenhados exclusivamente para as suas necessidades e objetivos.</li>
+                <li>✅ Alta Tecnologia: Equipamentos de última geração, como a avaliação corporal por bioimpedância (Inbody 270) para máxima precisão e resultado.</li>
+                <li>✅ Comunidade Rocha: Um ambiente inspirador, cheio de histórias reais e motivação constante.</li>
                 <li>• Acompanhamento pós-tratamento para garantir a manutenção dos resultados</li>
                 <li>• Plataforma digital "Minha Meta" para engajamento contínuo dos pacientes</li>
               </ul>
