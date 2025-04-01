@@ -20,8 +20,15 @@ interface PatientSidebarProps {
 const PatientSidebar = ({ activeTab, setActiveTab }: PatientSidebarProps) => {
   const isMobile = useIsMobile();
 
+  const handleTabChange = (tab: string) => {
+    // Only change the tab if it's different from the current one
+    if (tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  };
+
   return (
-    <aside className="bg-secondary text-white w-full md:w-20 lg:w-64 md:flex md:flex-col md:min-h-screen">
+    <aside className="bg-secondary text-white w-full md:w-20 lg:w-64 md:flex md:flex-col md:min-h-screen z-20">
       <div className="p-4 flex items-center justify-center md:justify-start">
         <div className="bg-clinic-yellow p-2 rounded-md">
           <span className="font-bold text-clinic-black text-xl">MR</span>
@@ -32,28 +39,28 @@ const PatientSidebar = ({ activeTab, setActiveTab }: PatientSidebarProps) => {
       {isMobile ? (
         <nav className="flex justify-around p-2 border-t border-secondary-foreground/20">
           <button
-            onClick={() => setActiveTab("dashboard")}
+            onClick={() => handleTabChange("dashboard")}
             className={`flex flex-col items-center p-2 ${activeTab === "dashboard" ? "text-clinic-yellow" : "text-white/80"}`}
           >
             <User className="h-5 w-5" />
             <span className="text-xs mt-1">Dashboard</span>
           </button>
           <button
-            onClick={() => setActiveTab("goals")}
+            onClick={() => handleTabChange("goals")}
             className={`flex flex-col items-center p-2 ${activeTab === "goals" ? "text-clinic-yellow" : "text-white/80"}`}
           >
             <CheckCircle className="h-5 w-5" />
             <span className="text-xs mt-1">Metas</span>
           </button>
           <button
-            onClick={() => setActiveTab("diary")}
+            onClick={() => handleTabChange("diary")}
             className={`flex flex-col items-center p-2 ${activeTab === "diary" ? "text-clinic-yellow" : "text-white/80"}`}
           >
             <FileText className="h-5 w-5" />
             <span className="text-xs mt-1">Diário</span>
           </button>
           <button
-            onClick={() => setActiveTab("medals")} 
+            onClick={() => handleTabChange("medals")} 
             className={`flex flex-col items-center p-2 ${activeTab === "medals" ? "text-clinic-yellow" : "text-white/80"}`}
           >
             <Trophy className="h-5 w-5" />
@@ -65,7 +72,7 @@ const PatientSidebar = ({ activeTab, setActiveTab }: PatientSidebarProps) => {
           <ul className="space-y-2">
             <li>
               <button
-                onClick={() => setActiveTab("dashboard")}
+                onClick={() => handleTabChange("dashboard")}
                 className={`w-full flex items-center px-4 py-3 ${
                   activeTab === "dashboard"
                     ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"
@@ -78,7 +85,7 @@ const PatientSidebar = ({ activeTab, setActiveTab }: PatientSidebarProps) => {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab("goals")}
+                onClick={() => handleTabChange("goals")}
                 className={`w-full flex items-center px-4 py-3 ${
                   activeTab === "goals"
                     ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"
@@ -91,7 +98,7 @@ const PatientSidebar = ({ activeTab, setActiveTab }: PatientSidebarProps) => {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab("diary")}
+                onClick={() => handleTabChange("diary")}
                 className={`w-full flex items-center px-4 py-3 ${
                   activeTab === "diary"
                     ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"
@@ -104,7 +111,7 @@ const PatientSidebar = ({ activeTab, setActiveTab }: PatientSidebarProps) => {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab("medals")}
+                onClick={() => handleTabChange("medals")}
                 className={`w-full flex items-center px-4 py-3 ${
                   activeTab === "medals"
                     ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"
@@ -117,7 +124,7 @@ const PatientSidebar = ({ activeTab, setActiveTab }: PatientSidebarProps) => {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab("achievements")}
+                onClick={() => handleTabChange("achievements")}
                 className={`w-full flex items-center px-4 py-3 ${
                   activeTab === "achievements"
                     ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"
@@ -130,7 +137,7 @@ const PatientSidebar = ({ activeTab, setActiveTab }: PatientSidebarProps) => {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab("settings")}
+                onClick={() => handleTabChange("settings")}
                 className={`w-full flex items-center px-4 py-3 ${
                   activeTab === "settings"
                     ? "bg-secondary-foreground/10 border-l-4 border-clinic-yellow"

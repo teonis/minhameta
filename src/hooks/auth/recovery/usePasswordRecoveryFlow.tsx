@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,6 +8,12 @@ import { PasswordRecoveryStep } from "@/components/auth/password/recovery/Progre
 import { RequestCodeValues } from "@/components/auth/password/recovery/RequestCodeStep";
 import { VerifyCodeValues } from "@/components/auth/password/recovery/VerifyCodeStep";
 import { ResetPasswordValues } from "@/components/auth/password/recovery/ResetPasswordStep";
+
+// Email validation helper function
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
 
 export const usePasswordRecoveryFlow = () => {
   const [currentStep, setCurrentStep] = useState<PasswordRecoveryStep>(PasswordRecoveryStep.REQUEST_CODE);
@@ -60,6 +67,13 @@ export const usePasswordRecoveryFlow = () => {
     
     try {
       const email = values.email;
+      
+      // Add email validation
+      if (!isValidEmail(email)) {
+        setError("Por favor, insira um endereço de e-mail válido.");
+        return;
+      }
+      
       setUserEmail(email);
       
       await sendRecoveryCode(email);
@@ -80,6 +94,13 @@ export const usePasswordRecoveryFlow = () => {
     
     try {
       const code = values.code;
+      
+      // Add code validation
+      if (!code || code.length < 6) {
+        setError("Por favor, insira um código válido.");
+        return;
+      }
+      
       setRecoveryCode(code);
       
       const isVerified = await verifyRecoveryCode(userEmail, code);
@@ -97,6 +118,17 @@ export const usePasswordRecoveryFlow = () => {
     setError("");
     
     try {
+      // Add password validation
+      if (values.password !== values.confirmPassword) {
+        setError("As senhas não coincidem.");
+        return;
+      }
+      
+      if (values.password.length < 8) {
+        setError("A senha deve ter pelo menos 8 caracteres.");
+        return;
+      }
+      
       const success = await resetPasswordWithCode(userEmail, recoveryCode, values.password);
       
       if (success) {
@@ -118,6 +150,12 @@ export const usePasswordRecoveryFlow = () => {
     setError("");
     
     try {
+      // Validate email before resending
+      if (!isValidEmail(userEmail)) {
+        setError("E-mail inválido. Por favor, volte e insira um e-mail válido.");
+        return;
+      }
+      
       await sendRecoveryCode(userEmail);
       
       const expiresAt = new Date();
