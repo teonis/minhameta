@@ -11,14 +11,10 @@ interface RecoveryFlowContentProps {
   currentStep: PasswordRecoveryStep;
   error: string;
   userEmail: string;
-  expirationTime: Date | null;
   isLoading: boolean;
-  canResend: boolean;
-  displayedCode: string | null;
   onRequestCode: (values: any) => Promise<void>;
   onVerifyCode: (values: any) => Promise<void>;
   onResetPassword: (values: any) => Promise<void>;
-  onResendCode: () => Promise<void>;
   onBackToRequestCode: () => void;
   onBackToVerifyCode: () => void;
   onRedirectToLogin: () => void;
@@ -28,14 +24,10 @@ const RecoveryFlowContent: React.FC<RecoveryFlowContentProps> = ({
   currentStep,
   error,
   userEmail,
-  expirationTime,
   isLoading,
-  canResend,
-  displayedCode,
   onRequestCode,
   onVerifyCode,
   onResetPassword,
-  onResendCode,
   onBackToRequestCode,
   onBackToVerifyCode,
   onRedirectToLogin
@@ -57,14 +49,6 @@ const RecoveryFlowContent: React.FC<RecoveryFlowContentProps> = ({
       
       <Card>
         <CardContent className="pt-6">
-          {displayedCode && currentStep === PasswordRecoveryStep.REQUEST_CODE && (
-            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-center">
-              <p className="text-sm font-medium">Um código de recuperação já foi gerado:</p>
-              <p className="text-lg font-mono tracking-widest mt-1">{displayedCode}</p>
-              <p className="text-xs text-gray-500 mt-1">Anote este código e clique em Enviar para prosseguir</p>
-            </div>
-          )}
-          
           {currentStep === PasswordRecoveryStep.REQUEST_CODE && (
             <RequestCodeStep 
               onSubmit={onRequestCode} 
@@ -76,13 +60,13 @@ const RecoveryFlowContent: React.FC<RecoveryFlowContentProps> = ({
           {currentStep === PasswordRecoveryStep.VERIFY_CODE && (
             <VerifyCodeStep 
               userEmail={userEmail}
-              expirationTime={expirationTime}
+              expirationTime={null}
               onSubmit={onVerifyCode} 
               onBack={onBackToRequestCode}
-              onResend={onResendCode}
+              onResend={() => {}}
               error={error} 
               isLoading={isLoading}
-              canResend={canResend}
+              canResend={false}
             />
           )}
           
