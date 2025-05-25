@@ -32,6 +32,13 @@ const RecoveryFlowContent: React.FC<RecoveryFlowContentProps> = ({
   onBackToVerifyCode,
   onRedirectToLogin
 }) => {
+  const handleResend = async () => {
+    // Simple resend implementation - just call onRequestCode with current email
+    if (userEmail) {
+      await onRequestCode({ email: userEmail });
+    }
+  };
+
   return (
     <>
       <div className="text-center mb-6">
@@ -63,10 +70,10 @@ const RecoveryFlowContent: React.FC<RecoveryFlowContentProps> = ({
               expirationTime={null}
               onSubmit={onVerifyCode} 
               onBack={onBackToRequestCode}
-              onResend={() => {}}
+              onResend={handleResend}
               error={error} 
               isLoading={isLoading}
-              canResend={false}
+              canResend={true}
             />
           )}
           
